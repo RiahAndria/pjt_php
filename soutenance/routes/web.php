@@ -11,10 +11,8 @@ Route::get('/etudiants/{matricule}/edit', [EtudiantController::class, 'edit'])->
 Route::put('/etudiants/{matricule}', [EtudiantController::class, 'update'])->name('etudiants.update');
 Route::delete('/etudiants/{matricule}', [EtudiantController::class, 'destroy'])->name('etudiants.destroy');
 
-// Route pour afficher la page (ex: http://127.0.0.1:8000/organismes)
+// Organisme routes
 Route::get('/organismes', [OrganismeController::class, 'index'])->name('organismes.index');
-
-// Route pour capter le formulaire d'ajout
 Route::post('/organismes', [OrganismeController::class, 'store'])->name('organismes.store');
 
 Route::get('/', function () {
