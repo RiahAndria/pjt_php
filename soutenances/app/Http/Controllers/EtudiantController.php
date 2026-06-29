@@ -20,22 +20,46 @@ class EtudiantController extends Controller
             $etudiants = Etudiant::all();
         }
 
+        // If AJAX request, return JSON data to update the table dynamically
+        if ($request->ajax()) {
+            $data = $etudiants->map(function ($e) {
+                return [
+                    'matricule' => $e->matricule,
+                    'nom' => $e->nom,
+                    'prenoms' => $e->prenoms,
+                    'niveau' => $e->niveau,
+                    'parcours' => $e->parcours,
+                    'adr_email' => $e->adr_email,
+                ];
+            })->values();
+
+            return response()->json(['data' => $data]);
+        }
+
         return view('etudiants.index', compact('etudiants', 'search'));
     }
 
     // 2. Enregistrer un étudiant
     public function store(Request $request)
     {
+        $nameRegex = '/^[\p{L}][\p{L}\s\'\-\.]*$/u';
+
         $request->validate([
             'matricule' => 'required|unique:etudiants,matricule',
-            'nom' => 'required',
-            'prenoms' => 'required',
+            'nom' => ['required','max:100', "regex:$nameRegex"],
+            'prenoms' => ['required','max:150', "regex:$nameRegex"],
             'niveau' => 'required',
             'parcours' => 'required',
             'adr_email' => 'required|email|unique:etudiants,adr_email',
         ]);
 
-        Etudiant::create($request->all());
+        $data = $request->all();
+        // Normalisation : nom en MAJUSCULES, prénoms en Title Case, email en minuscule
+        $data['nom'] = mb_strtoupper(trim($data['nom']), 'UTF-8');
+        $data['prenoms'] = mb_convert_case(trim($data['prenoms']), MB_CASE_TITLE, 'UTF-8');
+        $data['adr_email'] = mb_strtolower(trim($data['adr_email']), 'UTF-8');
+
+        Etudiant::create($data);
 
         return redirect()->back()->with('success', 'Étudiant ajouté avec succès !');
     }
@@ -51,16 +75,22 @@ class EtudiantController extends Controller
     public function update(Request $request, $matricule)
     {
         $etudiant = Etudiant::findOrFail($matricule);
+        $nameRegex = '/^[\p{L}][\p{L}\s\'\-\.]*$/u';
 
         $request->validate([
-            'nom' => 'required',
-            'prenoms' => 'required',
+            'nom' => ['required','max:100', "regex:$nameRegex"],
+            'prenoms' => ['required','max:150', "regex:$nameRegex"],
             'niveau' => 'required',
             'parcours' => 'required',
-            'adr_email' => 'required|email|unique:etudiants,adr_email,' . $matricule . ',matricule',
+            'adr_email' => ['required','email', 'unique:etudiants,adr_email,' . $matricule . ',matricule'],
         ]);
 
-        $etudiant->update($request->all());
+        $data = $request->all();
+        $data['nom'] = mb_strtoupper(trim($data['nom']), 'UTF-8');
+        $data['prenoms'] = mb_convert_case(trim($data['prenoms']), MB_CASE_TITLE, 'UTF-8');
+        $data['adr_email'] = mb_strtolower(trim($data['adr_email']), 'UTF-8');
+
+        $etudiant->update($data);
 
         return redirect()->route('etudiants.index')->with('success', 'Étudiant mis à jour avec succès !');
     }

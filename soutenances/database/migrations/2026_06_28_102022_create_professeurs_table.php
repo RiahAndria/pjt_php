@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('nom');
             $table->string('prenoms');
             $table->string('civilite'); // Liste de choix gérée dans le formulaire (Mr, Mlle, Mme)
-            $table->string('grade');    // Liste de choix gérée dans le formulaire (Professeur, Docteur...)
+            $table->string('grade');    // Liste de choix gérée dans le formulaire (Professeur titulaire, Maître de Conférences, Assistant)
             $table->timestamps();
         });
     }

@@ -18,6 +18,10 @@
 <div class="container">
     <h1>Modifier l'Étudiant : {{ $etudiant->matricule }}</h1>
 
+    @if($errors->any())
+        <div class="alert" style="background:#f8d7da;color:#721c24">{{ implode(' - ', $errors->all()) }}</div>
+    @endif
+
     <form action="{{ route('etudiants.update', $etudiant->matricule) }}" method="POST">
         @csrf
         @method('PUT')
