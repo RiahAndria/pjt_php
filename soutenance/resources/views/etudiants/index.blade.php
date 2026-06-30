@@ -21,7 +21,6 @@
 
 <div class="container">
     <h1>Gestion des Étudiants</h1>
-
     @if(session('success'))
         <div class="alert">{{ session('success') }}</div>
     @endif
