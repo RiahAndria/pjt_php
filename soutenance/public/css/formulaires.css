@@ -1,0 +1,38 @@
+
+.flex-form { 
+    display: flex; 
+    gap: var(--space-md); 
+    margin-bottom: var(--space-lg); 
+    flex-wrap: wrap; 
+}
+
+input, select { 
+    padding: 10px var(--space-md); 
+    border: 1px solid var(--color-border); 
+    border-radius: var(--border-radius-sm); 
+    min-width: 160px; 
+    font-family: inherit;
+    font-size: var(--font-size-base);
+    color: var(--color-text);
+    background-color: var(--color-white);
+    transition: border-color var(--transition);
+    flex: 1 1 180px;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.search-box { 
+    background: #fafbfc; 
+    padding: var(--space-md); 
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md); 
+    margin-bottom: var(--space-lg); 
+}
+
+.search-box h3 {
+    margin-top: 0;
+    margin-bottom: var(--space-md);
+}

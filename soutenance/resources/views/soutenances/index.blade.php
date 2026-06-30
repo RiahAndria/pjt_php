@@ -3,24 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Gestion des Soutenances</title>
-    <style>
-        body { font-family: sans-serif; margin: 40px; background: #f4f6f9; }
-        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .flex-form { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        input, select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; min-width: 150px; }
-        button { padding: 8px 15px; background: #2ecc71; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .btn-search { background: #34495e; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #dee2e6; padding: 12px; text-align: left; }
-        th { background: #f8fafc; }
-        .alert { padding: 10px; background: #d4edda; color: #155724; border-radius: 4px; margin-bottom: 20px; }
-        .search-box { background: #eef2f7; padding: 15px; border-radius: 6px; margin-bottom: 25px; }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
 </head>
 <body>
 
 <div class="container">
     <h1>Gestion des Soutenances</h1>
+    
     @if(session('success'))
         <div class="alert">{{ session('success') }}</div>
     @endif
@@ -31,7 +20,7 @@
             <input type="text" name="search" value="{{ $search }}" placeholder="Matricule ou Année...">
             <button type="submit" class="btn-search">Rechercher</button>
             @if($search)
-                <a href="{{ route('soutenances.index') }}" style="align-self: center; color: #e74c3c;">Réinitialiser</a>
+                <a href="{{ route('soutenances.index') }}" class="reset-link">Réinitialiser</a>
             @endif
         </form>
     </div>
@@ -106,22 +95,24 @@
                     <td>{{ $soutenance->matricule }}</td>
                     <td>{{ $soutenance->idorg }}</td>
                     <td>{{ $soutenance->annee_univ }}</td>
-                    <td><strong>{{ $soutenance->note }}/20</strong></td>
+                    <td><span class="note-tag">{{ $soutenance->note }}/20</span></td>
                     <td>{{ $soutenance->president }}</td>
                     <td>{{ $soutenance->examinateur }}</td>
                     <td>
-                        <a href="{{ route('soutenances.edit', $soutenance->id) }}" style="color: #3490dc; margin-right: 10px; text-decoration: none;">Modifier</a>
-                        
-                        <form action="{{ route('soutenances.destroy', $soutenance->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Supprimer cette soutenance ?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" style="background:none; border:none; color:#e3342f; cursor:pointer; padding:0;">Supprimer</button>
-                        </form>
+                        <div class="actions-cell">
+                            <a href="{{ route('soutenances.edit', $soutenance->id) }}" class="action-edit">Modifier</a>
+                            
+                            <form action="{{ route('soutenances.destroy', $soutenance->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Supprimer cette soutenance ?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="action-delete">Supprimer</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" style="text-align: center;">Aucune soutenance trouvée.</td>
+                    <td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: var(--space-lg) 0;">Aucune soutenance trouvée.</td>
                 </tr>
             @endforelse
         </tbody>
