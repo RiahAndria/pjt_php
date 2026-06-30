@@ -9,11 +9,18 @@ button, .btn-link {
     font-family: inherit;
     font-size: var(--font-size-base);
     font-weight: 500;
-    transition: background var(--transition);
+    transition: background var(--transition), transform 0.1s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 button:hover { 
     background: var(--color-primary-dark); 
+}
+
+button:active {
+    transform: scale(0.98);
 }
 
 .btn-search { 
@@ -28,44 +35,55 @@ button:hover {
 .actions-cell {
     display: flex;
     align-items: center;
-    gap: var(--space-md);
+    gap: var(--space-sm);
+}
+
+.action-edit, .action-delete {
+    background: var(--color-white) !important; /* Force un fond blanc propre */
+    border: 1px solid var(--color-border) !important;
+    width: 36px;
+    height: 36px;
+    border-radius: 50% !important; /* Donne une forme parfaitement ronde */
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0 !important;
+    transition: all var(--transition) !important;
 }
 
 .action-edit {
-    color: var(--color-primary); 
-    text-decoration: none;
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-    transition: color var(--transition);
+    color: var(--color-primary) !important;
+}
+
+.action-edit i {
+    font-size: 1.05rem; /* Agrandit légèrement la taille de l'icône */
 }
 
 .action-edit:hover {
-    color: var(--color-primary-dark);
-    text-decoration: underline;
+    background: var(--color-accent) !important; /* Fond bleu très clair au survol */
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary-dark) !important;
 }
 
 .action-delete {
-    background: none; 
-    border: none; 
-    color: var(--color-danger); 
-    cursor: pointer; 
-    padding: 0;
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-    transition: opacity var(--transition);
+    color: var(--color-danger) !important;
+}
+
+.action-delete i {
+    font-size: 1.05rem;
 }
 
 .action-delete:hover {
+    color: var(--color-danger-light);
     text-decoration: underline;
     opacity: 0.8;
 }
 
-.reset-link {
-    align-self: center; 
-    color: var(--color-text-muted);
-    text-decoration: none;
-    font-size: var(--font-size-sm);
-    transition: color var(--transition);
+.action-delete:hover {
+    background: var(--color-danger-light) !important; /* Fond rouge très clair au survol (défini dans tes variables) */
+    border-color: var(--color-danger) !important;
+    color: #991b1b !important; /* Rouge plus sombre au survol */
 }
 
 .reset-link:hover {

@@ -3,9 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <title>Gestion des Professeurs</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+    <style>
+        /* On garde la structure globale identique pour l'alignement */
+        body { margin: 0; padding: 0; background: var(--color-bg); display: flex; flex-direction: column; min-height: 100vh; }
+        .app-header { display: flex; align-items: center; padding: 0 var(--space-lg); height: 70px; background: #1e293b; border-bottom: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); position: fixed; top: 0; left: 0; right: 0; z-index: 110; }
+        .navbar-brand { font-size: 1.5rem; font-weight: 700; color: var(--color-white); letter-spacing: 0.5px; }
+        .app-body { display: flex; margin-top: 70px; flex: 1; }
+        .sidebar { width: 260px; background: #0f172a; border-right: 1px solid rgba(255, 255, 255, 0.05); padding: var(--space-md) var(--space-sm); display: flex; flex-direction: column; position: fixed; top: 70px; bottom: 0; left: 0; z-index: 100; }
+        .sidebar__menu { display: flex; flex-direction: column; gap: var(--space-sm); list-style: none; padding: 0; margin: 0; }
+        .sidebar__link { display: flex; align-items: center; gap: var(--space-md); padding: 0.8rem var(--space-md); color: rgba(255, 255, 255, 0.7); text-decoration: none; border-radius: var(--border-radius-sm); transition: all var(--transition); font-size: 0.95rem; font-weight: 500; }
+        .sidebar__link:hover { background: rgba(255, 255, 255, 0.05); color: var(--color-white); }
+        .sidebar__link--active { background: var(--color-primary); color: var(--color-white); font-weight: 600; }
+        .sidebar__link-icon { width: 20px; text-align: center; font-size: 1.1rem; }
+        
+        /* C'est cette marge à gauche qui évite que le tableau passe sous la sidebar */
+        .main-content { flex: 1; margin-left: 260px; padding: var(--space-lg); }
+    </style>
 </head>
 <body>
+
+<x-header />
+<div class="app-body">
+<x-sidebar />
+
+<main class="main-content">
 
 <div class="container">
     <h1>Gestion des Professeurs</h1>
@@ -22,7 +45,7 @@
         <h3>Rechercher un professeur</h3>
         <form id="professeur-search-form" action="{{ route('professeurs.index') }}" method="GET" class="flex-form" onsubmit="return false;">
             <input id="professeur-search-input" type="text" name="search" value="{{ $search }}" placeholder="Par identifiant, nom ou prénom...">
-            <button id="professeur-search-btn" type="button" class="btn-search">Rechercher</button>
+            <button id="professeur-search-btn" type="button" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
             @if($search)
                 <a id="professeur-reset" href="{{ route('professeurs.index') }}" style="align-self: center; color: #e74c3c;">Réinitialiser</a>
             @endif
@@ -74,6 +97,9 @@
     </table>
 </div>
 
+</main>
+</div>
+
 <script>
     (function(){
         const input = document.getElementById('professeur-search-input');
@@ -98,11 +124,11 @@
                             <td>${e.civilite}</td>
                             <td>${e.grade}</td>
                             <td>
-                                <a href="/professeurs/${e.idprof}/edit" style="color: #3490dc; margin-right: 10px; text-decoration: none;">Modifier</a>
+                                <a href="/professeurs/${e.idprof}/edit" style="color: #3490dc; margin-right: 10px; text-decoration: none;"><i class="fa-regular fa-pen-to-square"></i></a>
                                 <form action="/professeurs/${e.idprof}" method="POST" style="display:inline;" onsubmit="return confirm('Supprimer ce professeur ?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" style="background:none; border:none; color:#e3342f; cursor:pointer; padding:0;">Supprimer</button>
+                                    <button type="submit" style="background:none; border:none; color:#e3342f; cursor:pointer; padding:0;"><i class="fa-regular fa-trash-can"></i></button>
                                 </form>
                             </td>
                         </tr>

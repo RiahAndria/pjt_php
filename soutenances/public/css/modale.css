@@ -1,0 +1,46 @@
+.custom-modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    display: none;
+    align-items: center; 
+    justify-content: center;
+    z-index: 9999;
+    padding: var(--space-md);
+}
+.custom-modal-content {
+    background: var(--color-surface, white);
+    padding: var(--space-lg, 20px);
+    border-radius: var(--border-radius-md, 8px);
+    width: 100%; max-width: 500px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    text-align: left;
+    max-height: 80vh; overflow-y: auto;
+    flex-direction: column; display: flex;
+}
+.custom-modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--color-border, #ccc);
+    margin-bottom: var(--space-md, 15px);
+    flex-shrink: 0;
+}
+.close-modal-btn {
+    background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--color-text);
+}
+.custom-modal-footer {
+    display: flex; justify-content: flex-end; gap: var(--space-sm, 10px);
+    margin-top: var(--space-md, 15px);
+}
+.form-group { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
+
+.custom-modal-content .form-group {
+    flex-shrink: 0;
+}
+
+.custom-modal-content input,
+.custom-modal-content select {
+    flex: 0 1 auto; /* Annule l'étirement automatique provoqué par le flexbox */
+    height: 40px;   /* Optionnel : fixe une hauteur propre si nécessaire */
+    box-sizing: border-box;
+}

@@ -40,7 +40,7 @@ class EtudiantController extends Controller
         return redirect()->back()->with('success', 'Étudiant ajouté avec succès !');
     }
 
-    // 3. Afficher le formulaire de modification (L'élément manquant !)
+    // 3. Afficher le formulaire de modification
     public function edit($matricule)
     {
         $etudiant = Etudiant::findOrFail($matricule);
@@ -65,7 +65,7 @@ class EtudiantController extends Controller
         return redirect()->route('etudiants.index')->with('success', 'Étudiant mis à jour avec succès !');
     }
 
-    // 5. Supprimer l'étudiant (L'autre élément manquant !)
+    // 5. Supprimer l'étudiant
     public function destroy($matricule)
     {
         $etudiant = Etudiant::findOrFail($matricule);
