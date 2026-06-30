@@ -3,17 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Gestion des Organismes</title>
-    <style>
-        body { font-family: sans-serif; margin: 40px; background: #f4f6f9; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        form { margin-bottom: 30px; }
-        input { padding: 8px; margin-right: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 8px 15px; background: #3490dc; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #dee2e6; padding: 12px; text-align: left; }
-        th { background: #f8fafc; }
-        .alert { padding: 10px; background: #d4edda; color: #155724; border-radius: 4px; margin-bottom: 20px; }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
 </head>
 <body>
 

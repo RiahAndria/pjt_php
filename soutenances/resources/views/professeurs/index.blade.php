@@ -3,19 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Gestion des Professeurs</title>
-    <style>
-        body { font-family: sans-serif; margin: 40px; background: #f4f6f9; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .flex-form { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        input, select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; min-width: 150px; }
-        button { padding: 8px 15px; background: #2ecc71; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .btn-search { background: #34495e; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #dee2e6; padding: 12px; text-align: left; }
-        th { background: #f8fafc; }
-        .alert { padding: 10px; background: #d4edda; color: #155724; border-radius: 4px; margin-bottom: 20px; }
-        .search-box { background: #eef2f7; padding: 15px; border-radius: 6px; margin-bottom: 25px; }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
 </head>
 <body>
 

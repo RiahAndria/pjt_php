@@ -13,6 +13,13 @@ Route::get('/etudiants/{matricule}/edit', [EtudiantController::class, 'edit'])->
 Route::put('/etudiants/{matricule}', [EtudiantController::class, 'update'])->name('etudiants.update');
 Route::delete('/etudiants/{matricule}', [EtudiantController::class, 'destroy'])->name('etudiants.destroy');
 
+// Soutenance routes
+Route::get('/soutenances', [SoutenanceController::class, 'index'])->name('soutenances.index');
+Route::post('/soutenances', [SoutenanceController::class, 'store'])->name('soutenances.store');
+Route::get('/soutenances/{id}/edit', [SoutenanceController::class, 'edit'])->name('soutenances.edit');
+Route::put('/soutenances/{id}', [SoutenanceController::class, 'update'])->name('soutenances.update');
+Route::delete('/soutenances/{id}', [SoutenanceController::class, 'destroy'])->name('soutenances.destroy');
+
 // Professeur routes
 Route::get('/professeurs', [ProfesseurController::class, 'index'])->name('professeurs.index');
 Route::post('/professeurs', [ProfesseurController::class, 'store'])->name('professeurs.store');
