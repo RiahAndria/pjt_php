@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Etudiant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class EtudiantController extends Controller
 {
@@ -20,7 +21,14 @@ class EtudiantController extends Controller
             $etudiants = Etudiant::all();
         }
 
-        return view('etudiants.index', compact('etudiants', 'search'));
+        $effectifsParNiveau = Etudiant::select('niveau', DB::raw('count(*) as effectif'))
+            ->groupBy('niveau')
+            ->orderBy('niveau')
+            ->get();
+
+        $totalEtudiants = Etudiant::count();
+
+        return view('etudiants.index', compact('etudiants', 'search', 'effectifsParNiveau', 'totalEtudiants'));
     }
 
     // 2. Enregistrer un étudiant

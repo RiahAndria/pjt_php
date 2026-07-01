@@ -48,6 +48,18 @@
         </form>
     </div>
 
+    <div class="search-box">
+        <h3>Liste des notes entre deux dates</h3>
+        <form action="{{ route('soutenances.index') }}" method="GET" class="flex-form">
+            <input type="date" name="date_debut" value="{{ $dateDebut ?? '' }}">
+            <input type="date" name="date_fin" value="{{ $dateFin ?? '' }}">
+            <button type="submit" class="btn-search">Filtrer</button>
+        </form>
+        @if(($dateDebut ?? false) && ($dateFin ?? false))
+            <p>Notes filtrées de <strong>{{ $dateDebut }}</strong> à <strong>{{ $dateFin }}</strong> :</p>
+        @endif
+    </div>
+
     <h3>Ajouter une nouvelle soutenance</h3>
     <form action="{{ route('soutenances.store') }}" method="POST" class="flex-form">
         @csrf
@@ -99,6 +111,62 @@
 
         <button type="submit">Ajouter la soutenance</button>
     </form>
+
+    @if(($dateDebut ?? false) && ($dateFin ?? false))
+        <section class="stats-section">
+            <h3>Notes des étudiants entre {{ $dateDebut }} et {{ $dateFin }}</h3>
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>Matricule</th>
+                        <th>Année Univ</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($notesEntreDates as $soutenanceFiltree)
+                        <tr>
+                            <td>{{ $soutenanceFiltree->matricule }}</td>
+                            <td>{{ $soutenanceFiltree->annee_univ }}</td>
+                            <td>{{ $soutenanceFiltree->note }}/20</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" style="text-align: center; padding: 1rem 0;">Aucune note trouvée pour cette plage de dates.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </section>
+    @endif
+
+    <section class="stats-section">
+        <h3>Étudiants sans soutenance</h3>
+        <table class="stats-table">
+            <thead>
+                <tr>
+                    <th>Matricule</th>
+                    <th>Nom</th>
+                    <th>Prénoms</th>
+                    <th>Niveau</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($etudiantsSansSoutenance as $etudiantSans)
+                    <tr>
+                        <td>{{ $etudiantSans->matricule }}</td>
+                        <td>{{ $etudiantSans->nom }}</td>
+                        <td>{{ $etudiantSans->prenoms }}</td>
+                        <td>{{ $etudiantSans->niveau }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 1rem 0;">Tous les étudiants ont déjà une soutenance.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </section>
 
     <table>
         <thead>

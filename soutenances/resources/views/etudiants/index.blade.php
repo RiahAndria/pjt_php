@@ -85,6 +85,30 @@
         <button type="submit">Ajouter l'étudiant</button>
     </form>
 
+    <section class="stats-section">
+        <h3>Effectif des étudiants par niveau</h3>
+        <table class="stats-table">
+            <thead>
+                <tr>
+                    <th>Niveau</th>
+                    <th>Effectif</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($effectifsParNiveau as $stat)
+                    <tr>
+                        <td>{{ $stat->niveau }}</td>
+                        <td>{{ $stat->effectif }}</td>
+                    </tr>
+                @endforeach
+                <tr>
+                    <td><strong>Total</strong></td>
+                    <td><strong>{{ $totalEtudiants }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
     <table>
         <thead>
             <tr>
