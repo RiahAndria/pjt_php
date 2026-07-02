@@ -55,7 +55,7 @@
             <select name="grade" required>
                 <option value="Professeur titulaire" {{ $professeur->grade == 'Professeur titulaire' ? 'selected' : '' }}>Professeur titulaire</option>
                 <option value="Maître de Conférences" {{ $professeur->grade == 'Maître de Conférences' ? 'selected' : '' }}>Maître de Conférences</option>
-                <option value="Assistant d’Enseignement Supérieur et de Recherche" {{ $professeur->grade == 'Assistant d’Enseignement Supérieur et de Recherche' ? 'selected' : '' }}>Assistant d’Enseignement Supérieur et de Recherche</option>
+                    <option value="Assistant d'Enseignement Supérieur et de Recherche" {{ $professeur->grade == "Assistant d'Enseignement Supérieur et de Recherche" ? 'selected' : '' }}>Assistant d'Enseignement Supérieur et de Recherche</option>
                 <option value="Docteur HDR" {{ $professeur->grade == 'Docteur HDR' ? 'selected' : '' }}>Docteur HDR</option>
                 <option value="Docteur en Informatique" {{ $professeur->grade == 'Docteur en Informatique' ? 'selected' : '' }}>Docteur en Informatique</option>
                 <option value="Doctorant en informatique" {{ $professeur->grade == 'Doctorant en informatique' ? 'selected' : '' }}>Doctorant en informatique</option>

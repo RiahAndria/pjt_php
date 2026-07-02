@@ -11,7 +11,7 @@ class ProfesseurController extends Controller
     private static array $grades = [
         'Professeur titulaire',
         'Maître de Conférences',
-        'Assistant d’Enseignement Supérieur et de Recherche',
+        'Assistant d Enseignement Supérieur et de Recherche',
         'Docteur HDR',
         'Docteur en Informatique',
         'Doctorant en informatique',
@@ -68,13 +68,13 @@ class ProfesseurController extends Controller
         return redirect()->back()->with('success', 'Professeur ajouté avec succès !');
     }
 
-    public function edit($idprof)
+    public function edit(string $idprof)
     {
         $professeur = Professeur::findOrFail($idprof);
         return view('professeurs.edit', compact('professeur'));
     }
 
-    public function update(Request $request, $idprof)
+    public function update(Request $request, string $idprof)
     {
         $professeur = Professeur::findOrFail($idprof);
         $nameRegex = '/^[\p{L}][\p{L}\s\'\-\.]*$/u';
@@ -95,7 +95,7 @@ class ProfesseurController extends Controller
         return redirect()->route('professeurs.index')->with('success', 'Professeur mis à jour avec succès !');
     }
 
-    public function destroy($idprof)
+    public function destroy(string $idprof)
     {
         $professeur = Professeur::findOrFail($idprof);
         $professeur->delete();

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Etudiant;
+use App\Http\Requests\StoreEtudiantRequest;
+use App\Http\Requests\UpdateEtudiantRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -32,49 +34,31 @@ class EtudiantController extends Controller
     }
 
     // 2. Enregistrer un étudiant
-    public function store(Request $request)
+    public function store(StoreEtudiantRequest $request)
     {
-        $request->validate([
-            'matricule' => 'required|unique:etudiants,matricule',
-            'nom' => 'required',
-            'prenoms' => 'required',
-            'niveau' => 'required',
-            'parcours' => 'required',
-            'adr_email' => 'required|email|unique:etudiants,adr_email',
-        ]);
-
-        Etudiant::create($request->all());
+        Etudiant::create($request->validated());
 
         return redirect()->back()->with('success', 'Étudiant ajouté avec succès !');
     }
 
     // 3. Afficher le formulaire de modification
-    public function edit($matricule)
+    public function edit(string $matricule)
     {
         $etudiant = Etudiant::findOrFail($matricule);
         return view('etudiants.edit', compact('etudiant'));
     }
 
     // 4. Enregistrer les modifications
-    public function update(Request $request, $matricule)
+    public function update(UpdateEtudiantRequest $request, string $matricule)
     {
         $etudiant = Etudiant::findOrFail($matricule);
-
-        $request->validate([
-            'nom' => 'required',
-            'prenoms' => 'required',
-            'niveau' => 'required',
-            'parcours' => 'required',
-            'adr_email' => 'required|email|unique:etudiants,adr_email,' . $matricule . ',matricule',
-        ]);
-
-        $etudiant->update($request->all());
+        $etudiant->update($request->validated());
 
         return redirect()->route('etudiants.index')->with('success', 'Étudiant mis à jour avec succès !');
     }
 
     // 5. Supprimer l'étudiant
-    public function destroy($matricule)
+    public function destroy(string $matricule)
     {
         $etudiant = Etudiant::findOrFail($matricule);
         $etudiant->delete();

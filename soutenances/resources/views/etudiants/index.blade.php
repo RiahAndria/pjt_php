@@ -20,6 +20,32 @@
         
         /* C'est cette marge à gauche qui évite que le tableau passe sous la sidebar */
         .main-content { flex: 1; margin-left: 260px; padding: var(--space-lg); }
+
+        .form-group { position: relative; margin-bottom: 1.5rem; }
+        .field-error-message {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: calc(100% + 0.35rem);
+            z-index: 20;
+            padding: 0.45rem 0.65rem;
+            background: rgba(220, 53, 69, 0.96);
+            color: white;
+            border-radius: 0.35rem;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            white-space: nowrap;
+            pointer-events: none;
+        }
+        .field-error-message::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 12px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: transparent transparent rgba(220, 53, 69, 0.96) transparent;
+        }
     </style>
     <script>
     // Overture et fermeture du modal
@@ -31,6 +57,7 @@
            document.getElementById('modal-' + id).style.display = 'none';
         }
     </script>
+    <script src="{{ asset('js/validation-etudiant.js') }}" defer></script>
 </head>
 <body>
 
@@ -59,29 +86,114 @@
     </div>
 
     <h3>Ajouter un nouvel étudiant</h3>
-    <form action="{{ route('etudiants.store') }}" method="POST" class="flex-form">
+    
+    @if ($errors->any())
+        <div style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 4px; margin-bottom: 15px; border: 1px solid #f5c6cb;">
+            <strong>Erreurs trouvées :</strong>
+            <ul style="margin: 5px 0 0 20px;">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form action="{{ route('etudiants.store') }}" method="POST" class="flex-form student-validation">
         @csrf
-        <input type="text" name="matricule" placeholder="Matricule (ex: ETU001)" required>
-        <input type="text" name="nom" placeholder="Nom" required>
-        <input type="text" name="prenoms" placeholder="Prénoms" required>
+        <input 
+            type="text" 
+            id="matricule"
+            name="matricule" 
+            placeholder="Matricule (ex: ETU001)" 
+            maxlength="50"
+            value="{{ old('matricule') }}"
+            class="@error('matricule') is-invalid @enderror"
+            required
+        >
+        <span class="field-error-message" data-error-for="matricule"></span>
+        @error('matricule')
+            <span style="color: #dc3545; font-size: 0.875rem;">{{ $message }}</span>
+        @enderror
+
+        <input 
+            type="text" 
+            id="nom"
+            name="nom" 
+            placeholder="Nom" 
+            maxlength="100"
+            value="{{ old('nom') }}"
+            class="@error('nom') is-invalid @enderror"
+            required
+        >
+        <span class="field-error-message" data-error-for="nom"></span>
+        @error('nom')
+            <span style="color: #dc3545; font-size: 0.875rem;">{{ $message }}</span>
+        @enderror
+
+        <input 
+            type="text" 
+            id="prenoms"
+            name="prenoms" 
+            placeholder="Prénoms" 
+            maxlength="100"
+            value="{{ old('prenoms') }}"
+            class="@error('prenoms') is-invalid @enderror"
+            required
+        >
+        <span class="field-error-message" data-error-for="prenoms"></span>
+        @error('prenoms')
+            <span style="color: #dc3545; font-size: 0.875rem;">{{ $message }}</span>
+        @enderror
         
-        <select name="niveau" required>
-            <option value=""> Choisir Niveau </option>
-            <option value="L1">L1</option>
-            <option value="L2">L2</option>
-            <option value="L3">L3</option>
-            <option value="M1">M1</option>
-            <option value="M2">M2</option>
+        <select 
+            id="niveau"
+            name="niveau" 
+            class="@error('niveau') is-invalid @enderror"
+            required
+        >
+            <option value="">Choisir Niveau</option>
+            <option value="L1" {{ old('niveau') == 'L1' ? 'selected' : '' }}>L1</option>
+            <option value="L2" {{ old('niveau') == 'L2' ? 'selected' : '' }}>L2</option>
+            <option value="L3" {{ old('niveau') == 'L3' ? 'selected' : '' }}>L3</option>
+            <option value="M1" {{ old('niveau') == 'M1' ? 'selected' : '' }}>M1</option>
+            <option value="M2" {{ old('niveau') == 'M2' ? 'selected' : '' }}>M2</option>
         </select>
+        <span class="field-error-message" data-error-for="niveau"></span>
+        @error('niveau')
+            <span style="color: #dc3545; font-size: 0.875rem;">{{ $message }}</span>
+        @enderror
 
-        <select name="parcours" required>
-            <option value=""> Choisir Parcours </option>
-            <option value="GB">GB</option>
-            <option value="SR">SR</option>
-            <option value="IG">IG</option>
+        <select 
+            id="parcours"
+            name="parcours" 
+            class="@error('parcours') is-invalid @enderror"
+            required
+        >
+            <option value="">Choisir Parcours</option>
+            <option value="GB" {{ old('parcours') == 'GB' ? 'selected' : '' }}>GB</option>
+            <option value="SR" {{ old('parcours') == 'SR' ? 'selected' : '' }}>SR</option>
+            <option value="IG" {{ old('parcours') == 'IG' ? 'selected' : '' }}>IG</option>
         </select>
+        <span class="field-error-message" data-error-for="parcours"></span>
+        @error('parcours')
+            <span style="color: #dc3545; font-size: 0.875rem;">{{ $message }}</span>
+        @enderror
 
-        <input type="email" name="adr_email" placeholder="Adresse Email" required>
+        <input 
+            type="email" 
+            id="adr_email"
+            name="adr_email" 
+            placeholder="Adresse Email" 
+            maxlength="150"
+            value="{{ old('adr_email') }}"
+            class="@error('adr_email') is-invalid @enderror"
+            required
+        >
+        <span class="field-error-message" data-error-for="adr_email"></span>
+        @error('adr_email')
+            <span style="color: #dc3545; font-size: 0.875rem;">{{ $message }}</span>
+        @enderror
+
         <button type="submit">Ajouter l'étudiant</button>
     </form>
 

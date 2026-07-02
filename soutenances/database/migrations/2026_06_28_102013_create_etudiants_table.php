@@ -12,13 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('etudiants', function (Blueprint $table) {
-            $table->string('matricule')->primary(); // Clé primaire en string
-            $table->string('nom');
-            $table->string('prenoms');
-            $table->string('niveau'); // (L1, L2, L3, M1, M2)
-            $table->string('parcours'); // (GB, SR, IG)
-            $table->string('adr_email')->unique();
+            $table->string('matricule', 50)->primary(); // Clé primaire en string
+            $table->string('nom', 100);
+            $table->string('prenoms', 100);
+            $table->char('niveau', 2); // (L1, L2, L3, M1, M2)
+            $table->char('parcours', 2); // (GB, SR, IG)
+            $table->string('adr_email', 150)->unique();
             $table->timestamps();
+            
+            // Index pour optimiser les recherches
+            $table->index('nom');
+            $table->index('matricule');
         });
     }
 
