@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Etudiant;
+use App\Http\Requests\StoreEtudiantRequest;
+use App\Http\Requests\UpdateEtudiantRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class EtudiantController extends Controller
 {
@@ -21,62 +24,42 @@ class EtudiantController extends Controller
             $etudiants = Etudiant::all();
         }
 
-        return view('etudiants.index', compact('etudiants', 'search'));
+        $effectifsParNiveau = Etudiant::select('niveau', DB::raw('count(*) as effectif'))
+            ->groupBy('niveau')
+            ->orderBy('niveau')
+            ->get();
+
+        $totalEtudiants = Etudiant::count();
+
+        return view('etudiants.index', compact('etudiants', 'search', 'effectifsParNiveau', 'totalEtudiants'));
     }
 
     // 2. Enregistrer un étudiant
-    // regex à implémenter mais là j'ai la flemme...
-    public function store(Request $request)
+    public function store(StoreEtudiantRequest $request)
     {
-        //jsp si ça marchera si on inverse les commentaires mais je pose là sujte comme ça
-        //Ah, bah ça marche pas gros...
-        
-        //$nameRegex = '/^[\p{L}][\p{L}\s\'\-\.]*$/u';
-        
-        $request->validate([
-            'matricule' => 'required|unique:etudiants,matricule',
-            'nom' => 'required',
-            //'nom' => ['required', 'max:100', "regex = $nameRegex"], 
-            'prenoms' => 'required',
-            //'prenoms' => ['required', 'max:250', "regex = $nameRegex"],
-            'niveau' => 'required',
-            //'niveau' => ['required', 'max:10', "regex"],
-            'parcours' => 'required',
-            'adr_email' => 'required|email|unique:etudiants,adr_email',
-        ]);
-
-        Etudiant::create($request->all());
+        Etudiant::create($request->validated());
 
         return redirect()->back()->with('success', 'Étudiant ajouté avec succès !');
     }
 
     // 3. Afficher le formulaire de modification
-    public function edit($matricule)
+    public function edit(string $matricule)
     {
         $etudiant = Etudiant::findOrFail($matricule);
         return view('etudiants.edit', compact('etudiant'));
     }
 
     // 4. Enregistrer les modifications
-    public function update(Request $request, $matricule)
+    public function update(UpdateEtudiantRequest $request, string $matricule)
     {
         $etudiant = Etudiant::findOrFail($matricule);
-
-        $request->validate([
-            'nom' => 'required',
-            'prenoms' => 'required',
-            'niveau' => 'required',
-            'parcours' => 'required',
-            'adr_email' => 'required|email|unique:etudiants,adr_email,' . $matricule . ',matricule',
-        ]);
-
-        $etudiant->update($request->all());
+        $etudiant->update($request->validated());
 
         return redirect()->route('etudiants.index')->with('success', 'Étudiant mis à jour avec succès !');
     }
 
     // 5. Supprimer l'étudiant
-    public function destroy($matricule)
+    public function destroy(string $matricule)
     {
         $etudiant = Etudiant::findOrFail($matricule);
         $etudiant->delete();

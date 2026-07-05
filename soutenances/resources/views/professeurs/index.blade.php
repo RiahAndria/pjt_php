@@ -43,13 +43,12 @@
 
     <div class="search-box">
         <h3>Rechercher un professeur</h3>
-        <form id="professeur-search-form" action="{{ route('professeurs.index') }}" method="GET" class="flex-form" onsubmit="return false;">
-            <input id="professeur-search-input" type="text" name="search" value="{{ $search }}" placeholder="Par identifiant, nom ou prénom...">
-            <button id="professeur-search-btn" type="button" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <form action="{{ route('professeurs.index') }}" method="GET" class="flex-form">
+            <input type="text" name="search" value="{{ $search }}" placeholder="Par identifiant, nom ou prénom...">
+            <button type="submit" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
             @if($search)
-                <a id="professeur-reset" href="{{ route('professeurs.index') }}" style="align-self: center; color: #e74c3c;">Réinitialiser</a>
+                <a href="{{ route('professeurs.index') }}" class="reset-link">Réinitialiser</a>
             @endif
-            <div id="professeur-loader" style="display:none; align-self:center; margin-left:10px;">Chargement…</div>
         </form>
     </div>
 
@@ -71,7 +70,7 @@
             <option value="">-- Choisir Grade --</option>
             <option value="Professeur titulaire">Professeur titulaire</option>
             <option value="Maître de Conférences">Maître de Conférences</option>
-            <option value="Assistant d’Enseignement Supérieur et de Recherche">Assistant d’Enseignement Supérieur et de Recherche</option>
+            <option value="Assistant d'Enseignement Supérieur et de Recherche">Assistant d'Enseignement Supérieur et de Recherche</option>
             <option value="Docteur HDR">Docteur HDR</option>
             <option value="Docteur en Informatique">Docteur en Informatique</option>
             <option value="Doctorant en informatique">Doctorant en informatique</option>
@@ -91,70 +90,34 @@
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody id="professeurs-results">
-            @include('professeurs._rows')
+        <tbody>
+            @forelse($professeurs as $p)
+                <tr>
+                    <td>{{ $p->idprof }}</td>
+                    <td>{{ $p->nom }}</td>
+                    <td>{{ $p->prenoms }}</td>
+                    <td>{{ $p->civilite }}</td>
+                    <td>{{ $p->grade }}</td>
+                    <td>
+                        <a href="{{ route('professeurs.edit', $p->idprof) }}" style="color: #3490dc; margin-right: 10px; text-decoration: none;"><i class="fa-regular fa-pen-to-square"></i></a>
+                        <form action="{{ route('professeurs.destroy', $p->idprof) }}" method="POST" style="display:inline;" onsubmit="return confirm('Supprimer ce professeur ?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" style="background:none; border:none; color:#e3342f; cursor:pointer; padding:0;"><i class="fa-regular fa-trash-can"></i></button>
+                        </form>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" style="text-align:center; color: var(--color-text-muted); padding: var(--space-lg) 0;">Aucun professeur trouvé.</td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
 </div>
 
 </main>
 </div>
-
-<script>
-    (function(){
-        const input = document.getElementById('professeur-search-input');
-        const btn = document.getElementById('professeur-search-btn');
-        const results = document.getElementById('professeurs-results');
-        const loader = document.getElementById('professeur-loader');
-        let timer = null;
-
-        function fetchResults(q){
-            const url = new URL('{{ route('professeurs.index')}}', window.location.origin);
-            if(q) url.searchParams.set('search', q);
-            if(loader) loader.style.display = 'inline';
-            fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' } })
-                .then(r => r.json())
-                .then(json => {
-                    if(loader) loader.style.display = 'none';
-                    const rows = (json.data || []).map(e => `
-                        <tr>
-                            <td>${e.idprof}</td>
-                            <td>${e.nom}</td>
-                            <td>${e.prenoms}</td>
-                            <td>${e.civilite}</td>
-                            <td>${e.grade}</td>
-                            <td>
-                                <a href="/professeurs/${e.idprof}/edit" style="color: #3490dc; margin-right: 10px; text-decoration: none;"><i class="fa-regular fa-pen-to-square"></i></a>
-                                <form action="/professeurs/${e.idprof}" method="POST" style="display:inline;" onsubmit="return confirm('Supprimer ce professeur ?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" style="background:none; border:none; color:#e3342f; cursor:pointer; padding:0;"><i class="fa-regular fa-trash-can"></i></button>
-                                </form>
-                            </td>
-                        </tr>
-                    `).join('');
-
-                    if(rows.length === 0) {
-                        results.innerHTML = '<tr><td colspan="6" style="text-align:center;">Aucun professeur trouvé.</td></tr>';
-                    } else {
-                        results.innerHTML = rows;
-                    }
-                })
-                .catch(err => {
-                    if(loader) loader.style.display = 'none';
-                    console.error(err);
-                });
-        }
-
-        function debounceFetch(){
-            clearTimeout(timer);
-            timer = setTimeout(()=> fetchResults(input.value.trim()), 300);
-        }
-
-        input.addEventListener('input', debounceFetch);
-        btn.addEventListener('click', ()=> fetchResults(input.value.trim()));
-    })();
-</script>
 
 </body>
 </html>

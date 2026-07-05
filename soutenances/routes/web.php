@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrganismeController;
 use App\Http\Controllers\EtudiantController;
+use App\Http\Controllers\PdfController;
 use App\Http\Controllers\SoutenanceController;
 use App\Http\Controllers\ProfesseurController;
 
@@ -39,6 +40,8 @@ Route::delete('/organismes/{idorg}', [OrganismeController::class, 'destroy'])->n
 
 Route::get('/', function () {
     return view('welcome');
-
-
 });
+
+Route::get('/generation-pdf', [PdfController::class, 'index'])->name('generation-pdf.index');
+Route::get('/generation-pdf/modele', [PdfController::class, 'modele'])->name('generation-pdf.modele');
+Route::get('/generation-pdf/export', [PdfController::class, 'export'])->name('generation-pdf.export');
