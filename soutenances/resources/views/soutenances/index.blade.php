@@ -67,6 +67,7 @@
         </select>
 
         <input type="text" name="annee_univ" placeholder="Année univ (ex: 2022-2023)" required>
+        <input type="date" name="date_soutenance" placeholder="Date de soutenance">
         <input type="number" name="note" placeholder="Note" min="0" max="20" required>
         
         <select name="president" required>

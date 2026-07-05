@@ -39,14 +39,14 @@ class OrganismeController extends Controller
     }
 
     // 3. Afficher le formulaire d'édition pour un organisme
-    public function edit($idorg)
+    public function edit(int $idorg)
     {
         $organisme = Organisme::findOrFail($idorg);
         return view('organismes.edit', compact('organisme'));
     }
 
     // 4. Mettre à jour un organisme
-    public function update(Request $request, $idorg)
+    public function update(Request $request, int $idorg)
     {
         $organisme = Organisme::findOrFail($idorg);
         $designRegex = '/^(?=.*\p{L})[\p{L}0-9][\p{L}0-9\s\'\-\.,&()]*$/u';
@@ -68,7 +68,7 @@ class OrganismeController extends Controller
     }
 
     // 5. Supprimer un organisme
-    public function destroy($idorg)
+    public function destroy(int $idorg)
     {
         $organisme = Organisme::findOrFail($idorg);
         $organisme->delete();

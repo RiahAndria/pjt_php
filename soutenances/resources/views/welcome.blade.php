@@ -163,12 +163,22 @@
                 <button type="submit" class="btn-search">Filtrer</button>
             </form>
             @if(($dateDebut ?? false) && ($dateFin ?? false))
-                <p class="date-filter-hint">Notes filtrées de <strong>{{ $dateDebut }}</strong> à <strong>{{ $dateFin }}</strong> :</p>
+                @php
+                    try {
+                        $dDeb = \Carbon\Carbon::createFromFormat('Y-m-d', $dateDebut)->format('d/m/Y');
+                        $dFin = \Carbon\Carbon::createFromFormat('Y-m-d', $dateFin)->format('d/m/Y');
+                    } catch (Exception $e) {
+                        $dDeb = $dateDebut;
+                        $dFin = $dateFin;
+                    }
+                @endphp
+                <p class="date-filter-hint">Notes filtrées de <strong>{{ $dDeb }}</strong> à <strong>{{ $dFin }}</strong> :</p>
             @endif
             <div class="table-scroll">
                 <table class="stats-table">
                     <thead>
                         <tr>
+                            <th>Date</th>
                             <th>Matricule</th>
                             <th>Année Univ</th>
                             <th>Note</th>
@@ -176,11 +186,12 @@
                     </thead>
                     <tbody>
                         @forelse($notesEntreDates as $soutenanceFiltree)
-                            <tr>
-                                <td>{{ $soutenanceFiltree->matricule }}</td>
-                                <td>{{ $soutenanceFiltree->annee_univ }}</td>
-                                <td>{{ $soutenanceFiltree->note }}/20</td>
-                            </tr>
+                                <tr>
+                                    <td>{{ optional($soutenanceFiltree->date_soutenance) ? \Carbon\Carbon::parse($soutenanceFiltree->date_soutenance)->format('d/m/Y') : '' }}</td>
+                                    <td>{{ $soutenanceFiltree->matricule }}</td>
+                                    <td>{{ $soutenanceFiltree->annee_univ }}</td>
+                                    <td>{{ $soutenanceFiltree->note }}/20</td>
+                                </tr>
                         @empty
                             <tr>
                                 <td colspan="3" style="text-align: center; padding: 1rem 0; color: var(--color-text-muted);">

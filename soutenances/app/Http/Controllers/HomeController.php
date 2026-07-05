@@ -38,7 +38,10 @@ class HomeController extends Controller
                 $debut = Carbon::createFromFormat('Y-m-d', $dateDebut)->startOfDay();
                 $fin = Carbon::createFromFormat('Y-m-d', $dateFin)->endOfDay();
 
-                $notesEntreDates = Soutenance::whereBetween('created_at', [$debut, $fin])->get();
+                // Filtrer par date_soutenance (colonne dédiée) et trier chronologiquement
+                $notesEntreDates = Soutenance::whereBetween('date_soutenance', [$debut->toDateString(), $fin->toDateString()])
+                    ->orderBy('date_soutenance', 'asc')
+                    ->get();
             } catch (\Exception $e) {
                 // Si les dates sont invalides, on ignore le filtre
                 $notesEntreDates = collect();

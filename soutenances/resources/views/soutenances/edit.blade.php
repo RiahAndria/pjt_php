@@ -17,6 +17,16 @@
 
 <div class="container">
     <h1>Modifier la Soutenance ID : {{ $soutenance->id }}</h1>
+    @if ($errors->any())
+        <div style="background:#ffe6e6;border:1px solid #ffcccc;padding:10px;margin-bottom:15px;border-radius:4px;">
+            <strong>Des erreurs sont survenues :</strong>
+            <ul style="margin:8px 0 0 18px;padding:0;">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <form action="{{ route('soutenances.update', $soutenance->id) }}" method="POST">
         @csrf
@@ -50,6 +60,11 @@
         </div>
 
         <div class="form-group">
+            <label>Date de soutenance</label>
+            <input type="date" name="date_soutenance" value="{{ old('date_soutenance', $soutenance->date_soutenance ? \Carbon\Carbon::parse($soutenance->date_soutenance)->format('Y-m-d') : '') }}">
+        </div>
+
+        <div class="form-group">
             <label>Note</label>
             <input type="number" name="note" value="{{ $soutenance->note }}" min="0" max="20" required>
         </div>
@@ -71,6 +86,28 @@
                 @foreach($professeurs as $prof)
                     <option value="{{ $prof->idprof }}" {{ $soutenance->examinateur == $prof->idprof ? 'selected' : '' }}>
                         {{ $prof->civilite }} {{ $prof->nom }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Rapporteur Int.</label>
+            <select name="rapporteur_int" required>
+                @foreach($professeurs as $prof)
+                    <option value="{{ $prof->idprof }}" {{ $soutenance->rapporteur_int == $prof->idprof ? 'selected' : '' }}>
+                        {{ $prof->civilite }} {{ $prof->nom }} {{ isset($prof->prenoms) ? $prof->prenoms : '' }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Rapporteur Ext.</label>
+            <select name="rapporteur_ext" required>
+                @foreach($professeurs as $prof)
+                    <option value="{{ $prof->idprof }}" {{ $soutenance->rapporteur_ext == $prof->idprof ? 'selected' : '' }}>
+                        {{ $prof->civilite }} {{ $prof->nom }} {{ isset($prof->prenoms) ? $prof->prenoms : '' }}
                     </option>
                 @endforeach
             </select>

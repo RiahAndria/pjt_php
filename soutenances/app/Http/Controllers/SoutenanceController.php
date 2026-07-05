@@ -39,6 +39,7 @@ class SoutenanceController extends Controller
             'idorg' => 'required|exists:organismes,idorg',
             'annee_univ' => 'required|string',
             'note' => 'required|integer|min:0|max:20',
+            'date_soutenance' => 'nullable|date',
             'president' => 'required|exists:professeurs,idprof',
             'examinateur' => 'required|exists:professeurs,idprof',
             'rapporteur_int' => 'required|exists:professeurs,idprof',
@@ -50,7 +51,7 @@ class SoutenanceController extends Controller
         return redirect()->route('soutenances.index')->with('success', 'Soutenance ajoutée avec succès !');
     }
 
-    public function edit($id)
+    public function edit(int $id)
     {
         $soutenance = Soutenance::findOrFail($id);
         $etudiants = Etudiant::all();
@@ -60,7 +61,7 @@ class SoutenanceController extends Controller
         return view('soutenances.edit', compact('soutenance', 'etudiants', 'organismes', 'professeurs'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
         $soutenance = Soutenance::findOrFail($id);
 
@@ -69,6 +70,7 @@ class SoutenanceController extends Controller
             'idorg' => 'required|exists:organismes,idorg',
             'annee_univ' => 'required|string',
             'note' => 'required|integer|min:0|max:20',
+            'date_soutenance' => 'nullable|date',
             'president' => 'required|exists:professeurs,idprof',
             'examinateur' => 'required|exists:professeurs,idprof',
             'rapporteur_int' => 'required|exists:professeurs,idprof',
@@ -80,7 +82,7 @@ class SoutenanceController extends Controller
         return redirect()->route('soutenances.index')->with('success', 'Soutenance mise à jour avec succès !');
     }
 
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $soutenance = Soutenance::findOrFail($id);
         $soutenance->delete();

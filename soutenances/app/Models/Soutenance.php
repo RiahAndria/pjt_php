@@ -8,6 +8,11 @@ class Soutenance extends Model
 {
     protected $fillable = [
         'matricule', 'idorg', 'annee_univ', 'note', 
-        'president', 'examinateur', 'rapporteur_int', 'rapporteur_ext'
+        'president', 'examinateur', 'rapporteur_int', 'rapporteur_ext',
+        'date_soutenance'
+    ];
+
+    protected $casts = [
+        'date_soutenance' => 'date',
     ];
 }
