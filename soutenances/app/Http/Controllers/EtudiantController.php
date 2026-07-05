@@ -15,6 +15,7 @@ class EtudiantController extends Controller
         if ($search) {
             $etudiants = Etudiant::where('matricule', 'LIKE', "%{$search}%")
                 ->orWhere('nom', 'LIKE', "%{$search}%")
+                ->orWhere('prenoms', 'LIKE', "%{$search}%")
                 ->get();
         } else {
             $etudiants = Etudiant::all();
@@ -24,13 +25,22 @@ class EtudiantController extends Controller
     }
 
     // 2. Enregistrer un étudiant
+    // regex à implémenter mais là j'ai la flemme...
     public function store(Request $request)
     {
+        //jsp si ça marchera si on inverse les commentaires mais je pose là sujte comme ça
+        //Ah, bah ça marche pas gros...
+        
+        //$nameRegex = '/^[\p{L}][\p{L}\s\'\-\.]*$/u';
+        
         $request->validate([
             'matricule' => 'required|unique:etudiants,matricule',
             'nom' => 'required',
+            //'nom' => ['required', 'max:100', "regex = $nameRegex"], 
             'prenoms' => 'required',
+            //'prenoms' => ['required', 'max:250', "regex = $nameRegex"],
             'niveau' => 'required',
+            //'niveau' => ['required', 'max:10', "regex"],
             'parcours' => 'required',
             'adr_email' => 'required|email|unique:etudiants,adr_email',
         ]);
