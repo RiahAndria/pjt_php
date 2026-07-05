@@ -11,7 +11,7 @@ class ProfesseurController extends Controller
     private static array $grades = [
         'Professeur titulaire',
         'Maître de Conférences',
-        'Assistant d Enseignement Supérieur et de Recherche',
+        "Assistant d'Enseignement Supérieur et de Recherche",
         'Docteur HDR',
         'Docteur en Informatique',
         'Doctorant en informatique',

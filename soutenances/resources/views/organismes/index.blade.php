@@ -17,10 +17,39 @@
         .sidebar__link:hover { background: rgba(255, 255, 255, 0.05); color: var(--color-white); }
         .sidebar__link--active { background: var(--color-primary); color: var(--color-white); font-weight: 600; }
         .sidebar__link-icon { width: 20px; text-align: center; font-size: 1.1rem; }
-        
+
         /* C'est cette marge à gauche qui évite que le tableau passe sous la sidebar */
         .main-content { flex: 1; margin-left: 260px; padding: var(--space-lg); }
+
+        /* --- Ajouts pour la validation en direct --- */
+        .form-group { position: relative; display: inline-block; }
+        input.is-invalid { border-color: #dc3545; }
+        .field-error-message {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: calc(100% + 0.35rem);
+            z-index: 20;
+            padding: 0.45rem 0.65rem;
+            background: rgba(220, 53, 69, 0.96);
+            color: white;
+            border-radius: 0.35rem;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            white-space: nowrap;
+            pointer-events: none;
+        }
+        .field-error-message::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 12px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: transparent transparent rgba(220, 53, 69, 0.96) transparent;
+        }
     </style>
+    <script src="{{ asset('js/validation-organisme.js') }}" defer></script>
 </head>
 <body>
 
@@ -41,10 +70,19 @@
         <div class="alert" style="background:#f8d7da;color:#721c24">{{ implode(' - ', $errors->all()) }}</div>
     @endif
 
-    <form action="{{ route('organismes.store') }}" method="POST">
+    <form action="{{ route('organismes.store') }}" method="POST" class="organisme-validation">
         @csrf
-        <input type="text" name="design" placeholder="Désignation (ex: Ministère)" required>
-        <input type="text" name="lieu" placeholder="Lieu (ex: Paris)" required>
+
+        <div class="form-group">
+            <input type="text" id="design" name="design" placeholder="Désignation (ex: Ministère)" value="{{ old('design') }}" maxlength="150" class="@error('design') is-invalid @enderror" required>
+            <span class="field-error-message" data-error-for="design"></span>
+        </div>
+
+        <div class="form-group">
+            <input type="text" id="lieu" name="lieu" placeholder="Lieu (ex: Paris)" value="{{ old('lieu') }}" maxlength="100" class="@error('lieu') is-invalid @enderror" required>
+            <span class="field-error-message" data-error-for="lieu"></span>
+        </div>
+
         <button type="submit">Ajouter</button>
     </form>
 
