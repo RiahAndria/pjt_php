@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Gestion des soutenances</title>
+    <title>Tableau de bord</title>
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -39,9 +39,60 @@
                 </header>
 
                 <div class="welcome-body">
-                    <p>Sélectionnez une option dans le menu latéral pour commencer à gérer votre application.</p>
-                </div>
+                    <p style="color: var(--color-text-muted); margin-bottom: 2rem;">
+                        Bienvenue dans votre tableau de bord. Voici un aperçu global de l'application :
+                    </p>
+
+                    <section class="dashboard-section">
+                        <h3 style="color: #1e293b; margin-bottom: 1.25rem;"> Effectif d'étudiants par niveaux</h3>
+
+                        <div class="stats-cards-container">
+                            @php
+                                $niveauxCards = ['L1' => 0, 'L2' => 0, 'L3' => 0, 'M1' => 0, 'M2' => 0];
+                                if(isset($effectifsParNiveau)) {
+                                    foreach($effectifsParNiveau as $stat) {
+                                        if(array_key_exists($stat->niveau, $niveauxCards)) {
+                                            $niveauxCards[$stat->niveau] = $stat->effectif;
+                                        }
+                                    }
+                                }
+                            @endphp
+
+                            @foreach($niveauxCards as $niveau => $effectif)
+                                <div class="stat-card">
+                                    <div class="stat-card__badge">{{ $niveau }}</div>
+                                    <div class="stat-card__info">
+                                        <span class="stat-card__count">{{ $effectif }}</span>
+                                        <span class="stat-card__label">Étudiant{{ $effectif > 1 ? 's' : '' }}</span>
+                                    </div>
+                                </div>
+                            @endforeach
+
+                            <div class="stat-card stat-card--total">
+                                <div class="stat-card__badge"><i class="fa-solid fa-users"></i></div>
+                                <div class="stat-card__info">
+                                    <span class="stat-card__count">{{ $totalEtudiants ?? 0 }}</span>
+                                    <span class="stat-card__label">Total Étudiants</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    </div>
             </div>
+            <div class="dashboard-tables-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+        
+        <x-student-filter :etudiants="$tousEtudiants" />
+
+        <div style="background: #fff; padding: 1.25rem; border-radius: 10px; border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-style: italic;">
+            Tableau 2 : Sans soutenance (À implémenter)
+        </div>
+
+        <div style="background: #fff; padding: 1.25rem; border-radius: 10px; border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-style: italic;">
+            Tableau 3 : Notes entre 2 dates (À implémenter)
+        </div>
+        
+    </div>
         </main>
     </div>
 

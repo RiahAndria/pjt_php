@@ -27,7 +27,7 @@
             </li>
             <li>
                 <a href="{{ url('/soutenances') }}" class="sidebar__link {{ request()->is('soutenances*') ? 'sidebar__link--active' : '' }}">
-                    <i class="fas fa-project-diagram sidebar__link-icon"></i>
+                    <i class="fas fa-solid fa-folder-open sidebar__link-icon"></i>
                     <span class="sidebar__link-label">Soutenances</span>
                 </a>
             </li>

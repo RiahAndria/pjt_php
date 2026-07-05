@@ -6,6 +6,7 @@ use App\Http\Controllers\EtudiantController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\SoutenanceController;
 use App\Http\Controllers\ProfesseurController;
+use App\Http\Controllers\HomeController;
 
 //Etudiant routes
 Route::get('/etudiants', [EtudiantController::class, 'index'])->name('etudiants.index');
@@ -38,9 +39,7 @@ Route::get('/organismes/{idorg}/edit', [OrganismeController::class, 'edit'])->na
 Route::put('/organismes/{idorg}', [OrganismeController::class, 'update'])->name('organismes.update');
 Route::delete('/organismes/{idorg}', [OrganismeController::class, 'destroy'])->name('organismes.destroy');
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/generation-pdf', [PdfController::class, 'index'])->name('generation-pdf.index');
 Route::get('/generation-pdf/modele', [PdfController::class, 'modele'])->name('generation-pdf.modele');
