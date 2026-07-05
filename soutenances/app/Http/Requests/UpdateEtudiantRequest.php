@@ -27,7 +27,14 @@ class UpdateEtudiantRequest extends FormRequest
             'prenoms' => 'required|string|max:100|regex:/^[a-zA-ZÀ-ÿ\s\-\']+$/',
             'niveau' => ['required', Rule::in(['L1', 'L2', 'L3', 'M1', 'M2'])],
             'parcours' => ['required', Rule::in(['GB', 'SR', 'IG'])],
-            'adr_email' => 'required|email|max:150|unique:etudiants,adr_email,' . $this->route('etudiant'),
+            
+            // REMPLACEZ VOTRE ANCIENNE LIGNE PAR CELLE-CI :
+            'adr_email' => [
+                'required', 
+                'email', 
+                'max:150', 
+                Rule::unique('etudiants', 'adr_email')->ignore($this->route('matricule'), 'matricule')
+            ],
         ];
     }
 

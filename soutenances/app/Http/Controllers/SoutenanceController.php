@@ -17,18 +17,19 @@ class SoutenanceController extends Controller
         $dateDebut = $request->input('date_debut');
         $dateFin = $request->input('date_fin');
 
-        $soutenances = Soutenance::when($search, function ($query, $search) {
-            return $query->where('matricule', 'like', "%{$search}%")
-                         ->orWhere('annee_univ', 'like', "%{$search}%");
-        });
+        // Ajout de 'with' pour charger l'organisme et les profs
+        $soutenances = Soutenance::with(['organisme', 'profPresident', 'profExaminateur'])
+            ->when($search, function ($query, $search) {
+                return $query->where('matricule', 'like', "%{$search}%")
+                             ->orWhere('annee_univ', 'like', "%{$search}%");
+            });
 
+        // Filtrage par la date exacte de la soutenance
         if ($dateDebut && $dateFin) {
             try {
-                $debut = Carbon::createFromFormat('Y-m-d', $dateDebut)->startOfDay();
-                $fin = Carbon::createFromFormat('Y-m-d', $dateFin)->endOfDay();
-                $soutenances->whereBetween('created_at', [$debut, $fin]);
+                $soutenances->whereBetween('date_soutenance', [$dateDebut, $dateFin]);
             } catch (\Exception $e) {
-                // Si les dates sont invalides, on ignore le filtre de date
+                // Ignore
             }
         }
 
@@ -37,10 +38,7 @@ class SoutenanceController extends Controller
         $notesEntreDates = collect();
         if ($dateDebut && $dateFin) {
             try {
-                $debut = Carbon::createFromFormat('Y-m-d', $dateDebut)->startOfDay();
-                $fin = Carbon::createFromFormat('Y-m-d', $dateFin)->endOfDay();
-
-                $notesEntreDates = Soutenance::whereBetween('created_at', [$debut, $fin])->get();
+                $notesEntreDates = Soutenance::whereBetween('date_soutenance', [$dateDebut, $dateFin])->get();
             } catch (\Exception $e) {
                 $notesEntreDates = collect();
             }
@@ -69,6 +67,7 @@ class SoutenanceController extends Controller
         $validated = $request->validate([
             'matricule' => 'required|exists:etudiants,matricule',
             'idorg' => 'required|exists:organismes,idorg',
+            'date_soutenance' => 'required|date', // <--- Validation ajoutée
             'annee_univ' => 'required|string',
             'note' => 'required|integer|min:0|max:20',
             'president' => 'required|exists:professeurs,idprof',
@@ -99,6 +98,7 @@ class SoutenanceController extends Controller
         $validated = $request->validate([
             'matricule' => 'required|exists:etudiants,matricule',
             'idorg' => 'required|exists:organismes,idorg',
+            'date_soutenance' => 'required|date', // <--- Validation ajoutée
             'annee_univ' => 'required|string',
             'note' => 'required|integer|min:0|max:20',
             'president' => 'required|exists:professeurs,idprof',

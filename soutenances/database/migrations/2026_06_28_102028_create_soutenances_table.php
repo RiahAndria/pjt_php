@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('soutenances', function (Blueprint $table) {
             $table->id(); // Identifiant unique de la soutenance
             $table->string('matricule'); // Lié à l'étudiant
-            $table->unsignedBigInteger('idorg'); // Lié à l'organisme
+            $table->unsignedBigInteger('idorg');
+            $table->date('date_soutenance'); // Lié à l'organisme
             $table->string('annee_univ'); // Format 2022-2023
             $table->integer('note');
             

@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <style>
-        /* On garde la structure globale identique pour l'alignement */
         body { margin: 0; padding: 0; background: var(--color-bg); display: flex; flex-direction: column; min-height: 100vh; }
         .app-header { display: flex; align-items: center; padding: 0 var(--space-lg); height: 70px; background: #1e293b; border-bottom: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); position: fixed; top: 0; left: 0; right: 0; z-index: 110; }
         .navbar-brand { font-size: 1.5rem; font-weight: 700; color: var(--color-white); letter-spacing: 0.5px; }
@@ -18,7 +17,6 @@
         .sidebar__link--active { background: var(--color-primary); color: var(--color-white); font-weight: 600; }
         .sidebar__link-icon { width: 20px; text-align: center; font-size: 1.1rem; }
         
-        /* C'est cette marge à gauche qui évite que le tableau passe sous la sidebar */
         .main-content { flex: 1; margin-left: 260px; padding: var(--space-lg); }
     </style>
 </head>
@@ -37,8 +35,21 @@
         <div class="alert">{{ session('success') }}</div>
     @endif
 
+    <!-- Formulaire de filtrage par date exacte (décommenté et opérationnel) -->
     <div class="search-box">
-        <h3>Rechercher une soutenance</h3>
+        <h3>Filtrer par date de soutenance</h3>
+        <form action="{{ route('soutenances.index') }}" method="GET" class="flex-form">
+            <input type="date" name="date_debut" value="{{ $dateDebut ?? '' }}">
+            <input type="date" name="date_fin" value="{{ $dateFin ?? '' }}">
+            <button type="submit" class="btn-search">Filtrer</button>
+            @if($dateDebut || $dateFin)
+                <a href="{{ route('soutenances.index') }}" class="reset-link">Réinitialiser</a>
+            @endif
+        </form>
+    </div>
+
+    <div class="search-box">
+        <h3>Rechercher par matricule ou année</h3>
         <form action="{{ route('soutenances.index') }}" method="GET" class="flex-form">
             <input type="text" name="search" value="{{ $search }}" placeholder="Matricule ou Année...">
             <button type="submit" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
@@ -48,20 +59,8 @@
         </form>
     </div>
 
-    <div class="search-box">
-        <h3>Liste des notes entre deux dates</h3>
-        <form action="{{ route('soutenances.index') }}" method="GET" class="flex-form">
-            <input type="date" name="date_debut" value="{{ $dateDebut ?? '' }}">
-            <input type="date" name="date_fin" value="{{ $dateFin ?? '' }}">
-            <button type="submit" class="btn-search">Filtrer</button>
-        </form>
-        @if(($dateDebut ?? false) && ($dateFin ?? false))
-            <p>Notes filtrées de <strong>{{ $dateDebut }}</strong> à <strong>{{ $dateFin }}</strong> :</p>
-        @endif
-    </div>
-
     <h3>Ajouter une nouvelle soutenance</h3>
-    <form action="{{ route('soutenances.store') }}" method="POST" class="flex-form">
+    <form action="{{ route('soutenances.store') }}" method="POST" class="flex-form" style="flex-wrap: wrap; gap: 10px;">
         @csrf
         
         <select name="matricule" required>
@@ -77,6 +76,9 @@
                 <option value="{{ $organisme->idorg }}">{{ $organisme->design }} ({{ $organisme->lieu }})</option>
             @endforeach
         </select>
+
+        <!-- 1. AJOUT DU CHAMP DATE DE SOUTENANCE -->
+        <input type="date" name="date_soutenance" title="Date de la soutenance" required>
 
         <input type="text" name="annee_univ" placeholder="Année univ (ex: 2022-2023)" required>
         <input type="number" name="note" placeholder="Note" min="0" max="20" required>
@@ -109,74 +111,19 @@
             @endforeach
         </select>
 
-        <button type="submit">Ajouter la soutenance</button>
+        <button type="submit" style="width: 100%;">Ajouter la soutenance</button>
     </form>
-
-    @if(($dateDebut ?? false) && ($dateFin ?? false))
-        <section class="stats-section">
-            <h3>Notes des étudiants entre {{ $dateDebut }} et {{ $dateFin }}</h3>
-            <table class="stats-table">
-                <thead>
-                    <tr>
-                        <th>Matricule</th>
-                        <th>Année Univ</th>
-                        <th>Note</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($notesEntreDates as $soutenanceFiltree)
-                        <tr>
-                            <td>{{ $soutenanceFiltree->matricule }}</td>
-                            <td>{{ $soutenanceFiltree->annee_univ }}</td>
-                            <td>{{ $soutenanceFiltree->note }}/20</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="3" style="text-align: center; padding: 1rem 0;">Aucune note trouvée pour cette plage de dates.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </section>
-    @endif
-
-    <section class="stats-section">
-        <h3>Étudiants sans soutenance</h3>
-        <table class="stats-table">
-            <thead>
-                <tr>
-                    <th>Matricule</th>
-                    <th>Nom</th>
-                    <th>Prénoms</th>
-                    <th>Niveau</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($etudiantsSansSoutenance as $etudiantSans)
-                    <tr>
-                        <td>{{ $etudiantSans->matricule }}</td>
-                        <td>{{ $etudiantSans->nom }}</td>
-                        <td>{{ $etudiantSans->prenoms }}</td>
-                        <td>{{ $etudiantSans->niveau }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" style="text-align: center; padding: 1rem 0;">Tous les étudiants ont déjà une soutenance.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </section>
 
     <table>
         <thead>
             <tr>
                 <th>Étudiant</th>
                 <th>Organisme</th>
+                <th>Date Soutenance</th> <!-- Colonne ajoutée -->
                 <th>Année Univ</th>
                 <th>Note</th>
-                <th>Président (ID)</th>
-                <th>Examinateur (ID)</th>
+                <th>Président</th>
+                <th>Examinateur</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -184,11 +131,32 @@
             @forelse($soutenances as $soutenance)
                 <tr>
                     <td>{{ $soutenance->matricule }}</td>
-                    <td>{{ $soutenance->idorg }}</td>
+                    
+                    <!-- 2. NOM DE L'ORGANISME AU LIEU DE SON ID -->
+                    <td>{{ $soutenance->organisme ? $soutenance->organisme->design : 'N/A' }}</td>
+                    
+                    <!-- Affichage de la date -->
+                    <td>{{ \Carbon\Carbon::parse($soutenance->date_soutenance)->format('d/m/Y') }}</td>
+                    
                     <td>{{ $soutenance->annee_univ }}</td>
                     <td><span class="note-tag">{{ $soutenance->note }}/20</span></td>
-                    <td>{{ $soutenance->president }}</td>
-                    <td>{{ $soutenance->examinateur }}</td>
+                    
+                    <!-- 3. GRADE + NOM + PRENOM POUR LE PRESIDENT ET L'EXAMINATEUR -->
+                    <td>
+                        @if($soutenance->profPresident)
+                            {{ $soutenance->profPresident->civilite }}. {{ $soutenance->profPresident->nom }} {{ $soutenance->profPresident->prenoms }}
+                        @else
+                            {{ $soutenance->president }}
+                        @endif
+                    </td>
+                    <td>
+                        @if($soutenance->profExaminateur)
+                            {{ $soutenance->profExaminateur->civilite }}. {{ $soutenance->profExaminateur->nom }} {{ $soutenance->profExaminateur->prenoms }}
+                        @else
+                            {{ $soutenance->examinateur }}
+                        @endif
+                    </td>
+                    
                     <td>
                         <div class="actions-cell">
                             <a href="{{ route('soutenances.edit', $soutenance->id) }}" class="action-edit"><i class="fa-regular fa-pen-to-square"></i></a>
@@ -203,7 +171,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: var(--space-lg) 0;">Aucune soutenance trouvée.</td>
+                    <td colspan="8" style="text-align: center; color: var(--color-text-muted); padding: var(--space-lg) 0;">Aucune soutenance trouvée.</td>
                 </tr>
             @endforelse
         </tbody>

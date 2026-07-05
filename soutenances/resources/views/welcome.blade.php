@@ -22,6 +22,56 @@
         .page-header { margin-bottom: var(--space-lg); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-md); }
         .page-header h1 { margin: 0; font-size: var(--font-size-xl); color: var(--color-secondary); }
         .subtitle { color: var(--color-text-muted); margin: var(--space-sm) 0 0 0; font-size: var(--font-size-base); }
+
+        /* --- NOUVEAUX STYLES POUR LES ONGLETS --- */
+        .tabs-container {
+            margin-top: 2rem;
+            background: #fff;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .tabs-nav {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 1rem var(--space-md);
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .tab-btn:hover {
+            color: #0f172a;
+            background: rgba(0, 0, 0, 0.01);
+        }
+        .tab-btn.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+            background: #ffffff;
+        }
+        .tab-panel {
+            display: none;
+            padding: 1.5rem;
+        }
+        .tab-panel.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -33,18 +83,21 @@
 
         <main class="main-content">
             <div class="container">
+                
+                <!-- En-tête de la page -->
                 <header class="page-header">
                     <h1>Gestion des soutenances</h1>
                     <p class="subtitle">Application de gestion de soutenance</p>
                 </header>
 
+                <!-- Section des statistiques -->
                 <div class="welcome-body">
                     <p style="color: var(--color-text-muted); margin-bottom: 2rem;">
                         Bienvenue dans votre tableau de bord. Voici un aperçu global de l'application :
                     </p>
 
                     <section class="dashboard-section">
-                        <h3 style="color: #1e293b; margin-bottom: 1.25rem;"> Effectif d'étudiants par niveaux</h3>
+                        <h3 style="color: #1e293b; margin-bottom: 1.25rem;">Effectif d'étudiants par niveaux</h3>
 
                         <div class="stats-cards-container">
                             @php
@@ -77,24 +130,115 @@
                             </div>
                         </div>
                     </section>
+                </div>
+
+                <!-- Structure en Onglets -->
+                <div class="tabs-container">
+                    <div class="tabs-nav">
+                        <button class="tab-btn active" data-tab="tab-inscriptions">
+                            <i class="fa-solid fa-filter"></i> Inscriptions par Classe
+                        </button>
+                        <button class="tab-btn" data-tab="tab-sans-soutenance">
+                            <i class="fa-solid fa-user-slash"></i> Sans soutenance
+                        </button>
+                        <button class="tab-btn" data-tab="tab-rapport-notes">
+                            <i class="fa-solid fa-calendar-days"></i> Rapport des notes
+                        </button>
+                    </div>
+
+                    <!-- Contenu Onglet 1 : Inscriptions par classe -->
+                    <div class="tab-panel active" id="tab-inscriptions">
+                        <x-student-filter :etudiants="$tousEtudiants" />
+                    </div>
+
+                    <!-- Contenu Onglet 2 : Sans soutenance -->
+                    <div class="tab-panel" id="tab-sans-soutenance">
+                        <x-etudiants-sans-soutenance :etudiants="$etudiantsSansSoutenance" />
+                    </div>
+
+                    <!-- Contenu Onglet 3 : Rapport des notes (Filtre + Tableau) -->
+                    <div class="tab-panel" id="tab-rapport-notes">
+    
+                        <!-- Boîte de filtrage avec des contrôles alignés et réduits -->
+                        <div class="search-box" style="background: #f8fafc; padding: 1rem 1.25rem; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                            <h3 style="margin: 0; color: #1e293b; font-size: 1rem;">
+                                <i class="fa-solid fa-filter" style="color: var(--color-primary); margin-right: 8px;"></i> 
+                                Filtrer par période
+                            </h3>
+                            
+                            <form action="{{ route('home') }}" method="GET" style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <label style="font-size: 0.85rem; color: #64748b; font-weight: 600;">Du</label>
+                                    <input type="date" name="date_debut" value="{{ $dateDebut ?? '' }}" style="padding: 0.35rem 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; background: #fff; font-size: 0.85rem; color: #334155;">
+                                </div>
+                                
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <label style="font-size: 0.85rem; color: #64748b; font-weight: 600;">Au</label>
+                                    <input type="date" name="date_fin" value="{{ $dateFin ?? '' }}" style="padding: 0.35rem 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; background: #fff; font-size: 0.85rem; color: #334155;">
+                                </div>
+
+                                <button type="submit" style="padding: 0.35rem 1rem; background: var(--color-primary); color: white; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background 0.2s;">
+                                    Rechercher
+                                </button>
+
+                                @if(($dateDebut ?? false) && ($dateFin ?? false))
+                                    <a href="{{ route('home') }}" style="color: #ef4444; text-decoration: none; font-size: 0.85rem; font-weight: 600; margin-left: 4px;">Réinitialiser</a>
+                                @endif
+                            </form>
+                        </div>
+
+                        <!-- Affichage du tableau ou du message vide -->
+                        @if(($dateDebut ?? false) && ($dateFin ?? false))
+                            <x-soutenances-dates 
+                                :notes-entre-dates="$notesEntreDates" 
+                                :date-debut="$dateDebut" 
+                                :date-fin="$dateFin" 
+                            />
+                        @else
+                            <div style="background: #fff; padding: 1.25rem; border-radius: 10px; border: 1px solid rgba(0,0,0,0.06); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--color-text-muted); text-align: center; min-height: 200px;">
+                                <i class="fa-solid fa-calendar-xmark" style="font-size: 2rem; color: #cbd5e1; margin-bottom: 0.75rem;"></i>
+                                <p style="margin: 0; font-size: 0.9rem;">Aucun filtre de date appliqué pour le rapport des notes.</p>
+                            </div>
+                        @endif
 
                     </div>
+                </div>
+
             </div>
-            <div class="dashboard-tables-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
-        
-        <x-student-filter :etudiants="$tousEtudiants" />
-
-        <div style="background: #fff; padding: 1.25rem; border-radius: 10px; border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-style: italic;">
-            Tableau 2 : Sans soutenance (À implémenter)
-        </div>
-
-        <div style="background: #fff; padding: 1.25rem; border-radius: 10px; border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-style: italic;">
-            Tableau 3 : Notes entre 2 dates (À implémenter)
-        </div>
-        
-    </div>
         </main>
     </div>
 
+    <!-- Script de gestion du basculement d'onglets et persistance après filtrage -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const panels = document.querySelectorAll('.tab-panel');
+
+            // Détection : Si une recherche par date est active, on force l'ouverture du 3ème onglet
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('date_debut') || urlParams.has('date_fin')) {
+                switchTab('tab-rapport-notes');
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.getAttribute('data-tab');
+                    switchTab(target);
+                });
+            });
+
+            function switchTab(tabId) {
+                tabs.forEach(t => {
+                    if(t.getAttribute('data-tab') === tabId) t.classList.add('active');
+                    else t.classList.remove('active');
+                });
+
+                panels.forEach(p => {
+                    if(p.id === tabId) p.classList.add('active');
+                    else p.classList.remove('active');
+                });
+            }
+        });
+    </script>
 </body>
 </html>
