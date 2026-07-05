@@ -3,9 +3,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // Regex alignées sur celles utilisées côté serveur dans OrganismeController.php
     const validationRules = {
         design: {
-            pattern: /^[\p{L}0-9][\p{L}0-9\s'\-.,&()]*$/u,
+            // (?=.*\p{L}) : exige au moins une lettre, pour rejeter les designations
+            // purement numériques comme "5646545" (aligné sur la regex serveur).
+            pattern: /^(?=.*\p{L})[\p{L}0-9][\p{L}0-9\s'\-.,&()]*$/u,
             maxLength: 150,
-            invalidMessage: 'La désignation doit commencer par une lettre ou un chiffre, et ne peut contenir que des lettres, chiffres, espaces, apostrophes, tirets, points, virgules, esperluettes et parenthèses.'
+            invalidMessage: 'La désignation doit contenir au moins une lettre (chiffres et ponctuation courante autorisés en complément).'
         },
         lieu: {
             pattern: /^[\p{L}][\p{L}\s\-]*$/u,

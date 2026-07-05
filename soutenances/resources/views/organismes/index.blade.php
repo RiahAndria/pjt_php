@@ -36,7 +36,8 @@
             border-radius: 0.35rem;
             font-size: 0.85rem;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            white-space: nowrap;
+            white-space: normal;
+            max-width: 280px;
             pointer-events: none;
         }
         .field-error-message::before {

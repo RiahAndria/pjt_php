@@ -115,6 +115,19 @@ document.addEventListener('DOMContentLoaded', function () {
         return '';
     }
 
+    function positionErrorMessage(input, messageElement) {
+        const form = input.closest('form');
+        if (!form || !messageElement) {
+            return;
+        }
+        // Le message est positionné en absolu par rapport au formulaire
+        // (voir CSS : la classe .prof-validation doit être en position: relative).
+        const formRect = form.getBoundingClientRect();
+        const inputRect = input.getBoundingClientRect();
+        messageElement.style.left = `${inputRect.left - formRect.left}px`;
+        messageElement.style.top = `${inputRect.bottom - formRect.top + 6}px`;
+    }
+
     function showFieldError(input) {
         const form = input.closest('form');
         const messageElement = form ? form.querySelector(`.field-error-message[data-error-for="${input.name}"]`) : null;
@@ -122,6 +135,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (messageElement) {
             messageElement.textContent = error;
+            if (error) {
+                positionErrorMessage(input, messageElement);
+            }
             messageElement.style.display = error ? 'block' : 'none';
         }
 
@@ -160,6 +176,16 @@ document.addEventListener('DOMContentLoaded', function () {
             if (hasError) {
                 event.preventDefault();
             }
+        });
+
+        // Recalcule la position des bulles d'erreur visibles si la fenêtre est redimensionnée
+        window.addEventListener('resize', () => {
+            inputs.forEach((input) => {
+                const messageElement = form.querySelector(`.field-error-message[data-error-for="${input.name}"]`);
+                if (messageElement && messageElement.style.display === 'block') {
+                    positionErrorMessage(input, messageElement);
+                }
+            });
         });
     });
 });

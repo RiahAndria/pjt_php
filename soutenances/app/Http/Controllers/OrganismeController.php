@@ -18,7 +18,9 @@ class OrganismeController extends Controller
     public function store(Request $request)
     {
         // Validation et normalisation
-        $designRegex = '/^[\p{L}0-9][\p{L}0-9\s\'\-\.,&()]*$/u';
+        // (?=.*\p{L}) : exige la présence d'au moins une lettre, pour rejeter
+        // les désignations purement numériques comme "5646545".
+        $designRegex = '/^(?=.*\p{L})[\p{L}0-9][\p{L}0-9\s\'\-\.,&()]*$/u';
         $lieuRegex = '/^[\p{L}][\p{L}\s\-]*$/u';
 
         $request->validate([
@@ -47,7 +49,7 @@ class OrganismeController extends Controller
     public function update(Request $request, $idorg)
     {
         $organisme = Organisme::findOrFail($idorg);
-        $designRegex = '/^[\p{L}0-9][\p{L}0-9\s\'\-\.,&()]*$/u';
+        $designRegex = '/^(?=.*\p{L})[\p{L}0-9][\p{L}0-9\s\'\-\.,&()]*$/u';
         $lieuRegex = '/^[\p{L}][\p{L}\s\-]*$/u';
 
         $request->validate([

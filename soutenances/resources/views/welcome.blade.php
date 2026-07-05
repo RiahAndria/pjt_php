@@ -22,6 +22,47 @@
         .page-header { margin-bottom: var(--space-lg); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-md); }
         .page-header h1 { margin: 0; font-size: var(--font-size-xl); color: var(--color-secondary); }
         .subtitle { color: var(--color-text-muted); margin: var(--space-sm) 0 0 0; font-size: var(--font-size-base); }
+
+        /* --- Cartes du tableau de bord (remplacent les anciens placeholders) --- */
+        .dashboard-card {
+            background: #fff;
+            padding: 1.25rem;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            display: flex;
+            flex-direction: column;
+            min-width: 0; /* évite que le contenu (ex: tableau) ne force le débordement de la grille */
+        }
+        .dashboard-card h3 {
+            margin: 0 0 1rem 0;
+            color: #1e293b;
+            font-size: 1.05rem;
+        }
+        .dashboard-card .date-filter-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .dashboard-card .date-filter-form input[type="date"] {
+            flex: 1 1 130px;
+            min-width: 0;
+            padding: 0.45rem 0.6rem;
+            border: 1px solid var(--color-border, #cbd5e1);
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+        .dashboard-card .date-filter-hint {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            margin: 0 0 0.75rem 0;
+        }
+        .dashboard-card .table-scroll {
+            overflow-x: auto;
+        }
+        .dashboard-card table.stats-table {
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -84,12 +125,76 @@
         
         <x-student-filter :etudiants="$tousEtudiants" />
 
-        <div style="background: #fff; padding: 1.25rem; border-radius: 10px; border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-style: italic;">
-            Tableau 2 : Sans soutenance (À implémenter)
+        <div class="dashboard-card">
+            <h3>Étudiants sans soutenance</h3>
+            <div class="table-scroll">
+                <table class="stats-table">
+                    <thead>
+                        <tr>
+                            <th>Matricule</th>
+                            <th>Nom</th>
+                            <th>Prénoms</th>
+                            <th>Niveau</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($etudiantsSansSoutenance as $etudiantSans)
+                            <tr>
+                                <td>{{ $etudiantSans->matricule }}</td>
+                                <td>{{ $etudiantSans->nom }}</td>
+                                <td>{{ $etudiantSans->prenoms }}</td>
+                                <td>{{ $etudiantSans->niveau }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 1rem 0; color: var(--color-text-muted);">Tous les étudiants ont déjà une soutenance.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <div style="background: #fff; padding: 1.25rem; border-radius: 10px; border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-style: italic;">
-            Tableau 3 : Notes entre 2 dates (À implémenter)
+        <div class="dashboard-card">
+            <h3>Notes des étudiants entre deux dates</h3>
+            <form method="GET" class="date-filter-form">
+                <input type="date" name="date_debut" value="{{ $dateDebut ?? '' }}">
+                <input type="date" name="date_fin" value="{{ $dateFin ?? '' }}">
+                <button type="submit" class="btn-search">Filtrer</button>
+            </form>
+            @if(($dateDebut ?? false) && ($dateFin ?? false))
+                <p class="date-filter-hint">Notes filtrées de <strong>{{ $dateDebut }}</strong> à <strong>{{ $dateFin }}</strong> :</p>
+            @endif
+            <div class="table-scroll">
+                <table class="stats-table">
+                    <thead>
+                        <tr>
+                            <th>Matricule</th>
+                            <th>Année Univ</th>
+                            <th>Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($notesEntreDates as $soutenanceFiltree)
+                            <tr>
+                                <td>{{ $soutenanceFiltree->matricule }}</td>
+                                <td>{{ $soutenanceFiltree->annee_univ }}</td>
+                                <td>{{ $soutenanceFiltree->note }}/20</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" style="text-align: center; padding: 1rem 0; color: var(--color-text-muted);">
+                                    @if(($dateDebut ?? false) && ($dateFin ?? false))
+                                        Aucune note trouvée pour cette plage de dates.
+                                    @else
+                                        Choisissez une plage de dates pour afficher des notes.
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
         
     </div>

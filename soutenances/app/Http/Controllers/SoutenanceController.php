@@ -7,60 +7,28 @@ use App\Models\Etudiant;
 use App\Models\Organisme;
 use App\Models\Professeur;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
 
 class SoutenanceController extends Controller
 {
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $dateDebut = $request->input('date_debut');
-        $dateFin = $request->input('date_fin');
 
         $soutenances = Soutenance::when($search, function ($query, $search) {
             return $query->where('matricule', 'like', "%{$search}%")
                          ->orWhere('annee_univ', 'like', "%{$search}%");
-        });
-
-        if ($dateDebut && $dateFin) {
-            try {
-                $debut = Carbon::createFromFormat('Y-m-d', $dateDebut)->startOfDay();
-                $fin = Carbon::createFromFormat('Y-m-d', $dateFin)->endOfDay();
-                $soutenances->whereBetween('created_at', [$debut, $fin]);
-            } catch (\Exception $e) {
-                // Si les dates sont invalides, on ignore le filtre de date
-            }
-        }
-
-        $soutenances = $soutenances->get();
-
-        $notesEntreDates = collect();
-        if ($dateDebut && $dateFin) {
-            try {
-                $debut = Carbon::createFromFormat('Y-m-d', $dateDebut)->startOfDay();
-                $fin = Carbon::createFromFormat('Y-m-d', $dateFin)->endOfDay();
-
-                $notesEntreDates = Soutenance::whereBetween('created_at', [$debut, $fin])->get();
-            } catch (\Exception $e) {
-                $notesEntreDates = collect();
-            }
-        }
+        })->get();
 
         $etudiants = Etudiant::all();
         $organismes = Organisme::all();
         $professeurs = Professeur::all();
-        $etudiantsSansSoutenance = Etudiant::whereNotIn('matricule', Soutenance::select('matricule'))->get();
 
         return view('soutenances.index', compact(
             'soutenances',
             'search',
             'etudiants',
             'organismes',
-            'professeurs',
-            'dateDebut',
-            'dateFin',
-            'notesEntreDates',
-            'etudiantsSansSoutenance'
+            'professeurs'
         ));
     }
 
