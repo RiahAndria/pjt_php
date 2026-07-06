@@ -28,7 +28,6 @@ class UpdateEtudiantRequest extends FormRequest
             'niveau' => ['required', Rule::in(['L1', 'L2', 'L3', 'M1', 'M2'])],
             'parcours' => ['required', Rule::in(['GB', 'SR', 'IG'])],
             
-            // REMPLACEZ VOTRE ANCIENNE LIGNE PAR CELLE-CI :
             'adr_email' => [
                 'required', 
                 'email', 

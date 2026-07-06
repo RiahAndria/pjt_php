@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class EtudiantController extends Controller
 {
-    // 1. Afficher la liste et gérer la recherche
+    // Afficher la liste et gérer la recherche
     public function index(Request $request)
     {
         $search = $request->input('search');
@@ -34,7 +34,7 @@ class EtudiantController extends Controller
         return view('etudiants.index', compact('etudiants', 'search', 'effectifsParNiveau', 'totalEtudiants'));
     }
 
-    // 2. Enregistrer un étudiant
+    // Enregistrer un étudiant
     public function store(StoreEtudiantRequest $request)
     {
         Etudiant::create($request->validated());
@@ -42,14 +42,14 @@ class EtudiantController extends Controller
         return redirect()->back()->with('success', 'Étudiant ajouté avec succès !');
     }
 
-    // 3. Afficher le formulaire de modification
+    // Afficher le formulaire de modification
     public function edit(string $matricule)
     {
         $etudiant = Etudiant::findOrFail($matricule);
         return view('etudiants.edit', compact('etudiant'));
     }
 
-    // 4. Enregistrer les modifications
+    // Enregistrer les modifications
     public function update(UpdateEtudiantRequest $request, string $matricule)
     {
         $etudiant = Etudiant::findOrFail($matricule);
@@ -58,7 +58,7 @@ class EtudiantController extends Controller
         return redirect()->route('etudiants.index')->with('success', 'Étudiant mis à jour avec succès !');
     }
 
-    // 5. Supprimer l'étudiant
+    // Supprimer l'étudiant
     public function destroy(string $matricule)
     {
         $etudiant = Etudiant::findOrFail($matricule);

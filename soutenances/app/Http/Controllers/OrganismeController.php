@@ -7,14 +7,14 @@ use Illuminate\Http\Request;
 
 class OrganismeController extends Controller
 {
-    // 1. Afficher la liste des organismes
+    // Afficher la liste des organismes
     public function index()
     {
         $organismes = Organisme::all(); // Récupère tous les organismes de Postgres
         return view('organismes.index', compact('organismes'));
     }
 
-    // 2. Enregistrer un organisme dans la base de données
+    // Enregistrer un organisme dans la base de données
     public function store(Request $request)
     {
         // Validation et normalisation
@@ -36,14 +36,14 @@ class OrganismeController extends Controller
         return redirect()->back()->with('success', 'Organisme ajouté avec succès !');
     }
 
-    // 3. Afficher le formulaire d'édition pour un organisme
+    // Afficher le formulaire d'édition pour un organisme
     public function edit($idorg)
     {
         $organisme = Organisme::findOrFail($idorg);
         return view('organismes.edit', compact('organisme'));
     }
 
-    // 4. Mettre à jour un organisme
+    // Mettre à jour un organisme
     public function update(Request $request, $idorg)
     {
         $organisme = Organisme::findOrFail($idorg);
@@ -65,7 +65,7 @@ class OrganismeController extends Controller
         return redirect()->route('organismes.index')->with('success', 'Organisme mis à jour avec succès !');
     }
 
-    // 5. Supprimer un organisme
+    // Supprimer un organisme
     public function destroy($idorg)
     {
         $organisme = Organisme::findOrFail($idorg);

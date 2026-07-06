@@ -11,7 +11,7 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
-        // 1. Les statistiques globales (déjà faites)
+        // Les statistiques globales
         $effectifsParNiveau = Etudiant::select('niveau', DB::raw('count(*) as effectif'))
             ->groupBy('niveau')
             ->orderBy('niveau')
@@ -19,7 +19,7 @@ class HomeController extends Controller
 
         $totalEtudiants = Etudiant::count();
 
-        // 2. On récupère TOUS les étudiants pour notre nouveau tableau filtrable
+        // On récupère les étudiants pour le tableau où on les filtre et les affiche
         $tousEtudiants = Etudiant::orderBy('nom')->orderBy('prenoms')->get();
 
         $etudiantsSansSoutenance = Etudiant::whereNotIn('matricule', function($query) {
@@ -28,17 +28,16 @@ class HomeController extends Controller
 
         $dateDebut = $request->input('date_debut');
         $dateFin = $request->input('date_fin');
-        $notesEntreDates = collect(); // Collection vide par défaut
+        $notesEntreDates = collect(); // vide par défaut
 
         if ($dateDebut && $dateFin) {
-            // Adaptez le nom de la colonne de date si nécessaire (ex: date_soutenance, créé_a, etc.)
             $notesEntreDates = Soutenance::whereBetween('date_soutenance', [$dateDebut, $dateFin])
                 ->orderBy('date_soutenance', 'desc')
                 ->get();
         }
 
 
-        // 3. On envoie tout à la vue welcome
+        // On envoie tout à la page Welcome.blade.php pour affichage
         return view('welcome', compact(
             'effectifsParNiveau', 
             'totalEtudiants', 
