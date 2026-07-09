@@ -20,11 +20,16 @@ class HomeController extends Controller
         $totalEtudiants = Etudiant::count();
 
         // On récupère les étudiants pour le tableau où on les filtre et les affiche
-        $tousEtudiants = Etudiant::orderBy('nom')->orderBy('prenoms')->get();
+        $tousEtudiants = Etudiant::orderBy('nom')->orderBy('prenoms')->orderBy('matricule')->get();
 
-        $etudiantsSansSoutenance = Etudiant::whereNotIn('matricule', function($query) {
-            $query->select('matricule')->from('soutenances');
-        })->orderBy('nom')->get();
+        $etudiantsSansSoutenance = Etudiant::whereIn('niveau', ['L3', 'M2'])
+            ->whereNotIn('matricule', function($query) {
+                $query->select('matricule')->from('soutenances');
+            })
+            ->orderBy('niveau') // L3 avant M2
+            ->orderBy('nom')
+            ->orderBy('matricule')
+            ->get();
 
         $dateDebut = $request->input('date_debut');
         $dateFin = $request->input('date_fin');
