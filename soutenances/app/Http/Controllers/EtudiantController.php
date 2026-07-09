@@ -19,9 +19,10 @@ class EtudiantController extends Controller
             $etudiants = Etudiant::where('matricule', 'LIKE', "%{$search}%")
                 ->orWhere('nom', 'LIKE', "%{$search}%")
                 ->orWhere('prenoms', 'LIKE', "%{$search}%")
+                ->orderBy('matricule')
                 ->get();
         } else {
-            $etudiants = Etudiant::all();
+            $etudiants = Etudiant::orderBy('matricule')->get();
         }
 
         $effectifsParNiveau = Etudiant::select('niveau', DB::raw('count(*) as effectif'))

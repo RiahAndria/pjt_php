@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrganismeController;
 use App\Http\Controllers\EtudiantController;
-use App\Http\Controllers\PdfController;
 use App\Http\Controllers\SoutenanceController;
 use App\Http\Controllers\ProfesseurController;
 use App\Http\Controllers\HomeController;
@@ -19,6 +18,7 @@ Route::delete('/etudiants/{matricule}', [EtudiantController::class, 'destroy'])-
 Route::get('/soutenances', [SoutenanceController::class, 'index'])->name('soutenances.index');
 Route::post('/soutenances', [SoutenanceController::class, 'store'])->name('soutenances.store');
 Route::get('/soutenances/{id}/edit', [SoutenanceController::class, 'edit'])->name('soutenances.edit');
+Route::get('/soutenances/{id}/pdf', [SoutenanceController::class, 'generatePdf'])->name('soutenances.pdf');
 Route::put('/soutenances/{id}', [SoutenanceController::class, 'update'])->name('soutenances.update');
 Route::delete('/soutenances/{id}', [SoutenanceController::class, 'destroy'])->name('soutenances.destroy');
 
@@ -40,7 +40,3 @@ Route::put('/organismes/{idorg}', [OrganismeController::class, 'update'])->name(
 Route::delete('/organismes/{idorg}', [OrganismeController::class, 'destroy'])->name('organismes.destroy');
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-
-Route::get('/generation-pdf', [PdfController::class, 'index'])->name('generation-pdf.index');
-Route::get('/generation-pdf/modele', [PdfController::class, 'modele'])->name('generation-pdf.modele');
-Route::get('/generation-pdf/export', [PdfController::class, 'export'])->name('generation-pdf.export');

@@ -61,7 +61,20 @@
 
         <div class="form-group">
             <label>Date de soutenance</label>
-            <input type="date" name="date_soutenance" value="{{ old('date_soutenance', $soutenance->date_soutenance ? \Carbon\Carbon::parse($soutenance->date_soutenance)->format('Y-m-d') : '') }}">
+            <input
+                type="text"
+                id="date_soutenance_display"
+                placeholder="jj/mm/aaaa"
+                maxlength="10"
+                inputmode="numeric"
+                autocomplete="off"
+            >
+            <input
+                type="hidden"
+                name="date_soutenance"
+                id="date_soutenance_hidden"
+                value="{{ old('date_soutenance', $soutenance->date_soutenance ? \Carbon\Carbon::parse($soutenance->date_soutenance)->format('Y-m-d') : '') }}"
+            >
         </div>
 
         <div class="form-group">
@@ -119,6 +132,45 @@
         </div>
     </form>
 </div>
+
+<script>
+    // --- Masque de saisie jj/mm/aaaa pour "Date de soutenance" ---
+    // Même logique que la page Soutenances : on affiche toujours jj/mm/aaaa
+    // (indépendamment de la langue/du système du navigateur), et on convertit
+    // vers le format ISO (aaaa-mm-jj) attendu par Laravel dans un champ caché.
+    (function () {
+        const display = document.getElementById('date_soutenance_display');
+        const hidden = document.getElementById('date_soutenance_hidden');
+        if (!display || !hidden) return;
+
+        // Pré-remplissage : convertit la date existante (aaaa-mm-jj) en jj/mm/aaaa pour l'affichage
+        if (hidden.value) {
+            const [y, m, d] = hidden.value.split('-');
+            if (y && m && d) display.value = `${d}/${m}/${y}`;
+        }
+
+        display.addEventListener('input', function () {
+            let digits = display.value.replace(/\D/g, '').slice(0, 8);
+            let formatted = digits;
+            if (digits.length > 4) {
+                formatted = digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
+            } else if (digits.length > 2) {
+                formatted = digits.slice(0, 2) + '/' + digits.slice(2);
+            }
+            display.value = formatted;
+        });
+
+        display.closest('form').addEventListener('submit', function (e) {
+            const match = display.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+            if (display.value && !match) {
+                e.preventDefault();
+                alert('Merci de saisir une date valide au format jj/mm/aaaa.');
+                return;
+            }
+            hidden.value = match ? `${match[3]}-${match[2]}-${match[1]}` : '';
+        });
+    })();
+</script>
 
 </body>
 </html>

@@ -25,9 +25,10 @@ class ProfesseurController extends Controller
             $professeurs = Professeur::where('idprof', 'LIKE', "%{$search}%")
                 ->orWhere('nom', 'LIKE', "%{$search}%")
                 ->orWhere('prenoms', 'LIKE', "%{$search}%")
+                ->orderBy('idprof')
                 ->get();
         } else {
-            $professeurs = Professeur::all();
+            $professeurs = Professeur::orderBy('idprof')->get();
         }
 
         if ($request->ajax()) {

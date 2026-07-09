@@ -12,7 +12,7 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
-        // 1. Les statistiques globales (déjà faites)
+        // 1. Les statistiques globales 
         $effectifsParNiveau = Etudiant::select('niveau', DB::raw('count(*) as effectif'))
             ->groupBy('niveau')
             ->orderBy('niveau')
@@ -21,11 +21,11 @@ class HomeController extends Controller
         $totalEtudiants = Etudiant::count();
 
         // 2. On récupère TOUS les étudiants pour notre tableau filtrable
-        $tousEtudiants = Etudiant::orderBy('nom')->orderBy('prenoms')->get();
+        $tousEtudiants = Etudiant::orderBy('matricule')->orderBy('nom')->orderBy('prenoms')->get();
 
         // 3. Liste des étudiants qui n'ont pas encore effectué de soutenance
         //    (déplacé depuis la page Soutenances)
-        $etudiantsSansSoutenance = Etudiant::whereNotIn('matricule', Soutenance::select('matricule'))->get();
+        $etudiantsSansSoutenance = Etudiant::whereNotIn('matricule', Soutenance::select('matricule'))->orderBy('nom')->orderBy('matricule')->get();
 
         // 4. Liste des notes des étudiants entre deux dates, filtre optionnel via GET
         //    (déplacé depuis la page Soutenances)

@@ -17,9 +17,44 @@
         .sidebar__link:hover { background: rgba(255, 255, 255, 0.05); color: var(--color-white); }
         .sidebar__link--active { background: var(--color-primary); color: var(--color-white); font-weight: 600; }
         .sidebar__link-icon { width: 20px; text-align: center; font-size: 1.1rem; }
-        
+
         /* C'est cette marge à gauche qui évite que le tableau passe sous la sidebar */
         .main-content { flex: 1; margin-left: 260px; padding: var(--space-lg); }
+
+        /* --- Bouton d'action "Générer PDF" --- */
+        .action-pdf { color: #16a34a; background: none; border: none; cursor: pointer; font-size: 1rem; padding: 4px; }
+        .action-pdf:hover { color: #15803d; }
+
+        /* --- Modale de confirmation de génération PDF --- */
+        .pdf-modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            align-items: center; justify-content: center;
+            z-index: 200;
+        }
+        .pdf-modal {
+            background: #fff;
+            border-radius: 12px;
+            padding: 28px 32px;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+        .pdf-modal h3 { margin: 0 0 12px; color: #0f172a; display: flex; align-items: center; gap: 8px; }
+        .pdf-modal p { margin: 6px 0; color: #334155; }
+        .pdf-modal-note { font-size: 0.85rem; color: #64748b; }
+        .pdf-modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        .pdf-modal-cancel {
+            padding: 0.6rem 1.1rem; border-radius: 0.6rem; border: 1px solid #cbd5e1;
+            background: #fff; color: #334155; cursor: pointer; font-weight: 600;
+        }
+        .pdf-modal-confirm {
+            padding: 0.6rem 1.1rem; border-radius: 0.6rem; border: none;
+            background: #16a34a; color: #fff; text-decoration: none; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .pdf-modal-confirm:hover { background: #15803d; }
     </style>
 </head>
 <body>
@@ -67,7 +102,8 @@
         </select>
 
         <input type="text" name="annee_univ" placeholder="Année univ (ex: 2022-2023)" required>
-        <input type="date" name="date_soutenance" placeholder="Date de soutenance">
+        <input type="text" id="date_soutenance_display" placeholder="jj/mm/aaaa" maxlength="10" inputmode="numeric" autocomplete="off">
+        <input type="hidden" name="date_soutenance" id="date_soutenance_hidden">
         <input type="number" name="note" placeholder="Note" min="0" max="20" required>
         
         <select name="president" required>
@@ -125,7 +161,19 @@
                     <td>
                         <div class="actions-cell">
                             <a href="{{ route('soutenances.edit', $soutenance->id) }}" class="action-edit"><i class="fa-regular fa-pen-to-square"></i></a>
-                            
+
+                            <button
+                                type="button"
+                                class="action-pdf"
+                                title="Générer le procès-verbal PDF"
+                                data-url="{{ route('soutenances.pdf', $soutenance->id) }}"
+                                data-etudiant="{{ $soutenance->etudiant ? $soutenance->etudiant->nom . ' ' . $soutenance->etudiant->prenoms : $soutenance->matricule }}"
+                                data-annee="{{ $soutenance->annee_univ }}"
+                                onclick="openPdfModal(this)"
+                            >
+                                <i class="fa-solid fa-file-pdf"></i>
+                            </button>
+
                             <form action="{{ route('soutenances.destroy', $soutenance->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Supprimer cette soutenance ?');">
                                 @csrf
                                 @method('DELETE')
@@ -145,6 +193,74 @@
     
 </main>
 </div>
+
+<!-- Modale de confirmation avant génération du PDF -->
+<div id="pdf-modal-overlay" class="pdf-modal-overlay">
+    <div class="pdf-modal">
+        <h3><i class="fa-solid fa-file-pdf"></i> Générer le procès-verbal</h3>
+        <p>Voulez-vous générer le PDF de la soutenance de <strong id="pdf-modal-etudiant"></strong> — <span id="pdf-modal-annee"></span> ?</p>
+        <p class="pdf-modal-note">Le fichier sera automatiquement téléchargé après confirmation.</p>
+        <div class="pdf-modal-actions">
+            <button type="button" class="pdf-modal-cancel" onclick="closePdfModal()">Annuler</button>
+            <a href="#" id="pdf-modal-confirm" class="pdf-modal-confirm">
+                <i class="fa-solid fa-download"></i> Générer et télécharger
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openPdfModal(btn) {
+        document.getElementById('pdf-modal-etudiant').textContent = btn.dataset.etudiant;
+        document.getElementById('pdf-modal-annee').textContent = btn.dataset.annee;
+        document.getElementById('pdf-modal-confirm').setAttribute('href', btn.dataset.url);
+        document.getElementById('pdf-modal-overlay').style.display = 'flex';
+    }
+
+    function closePdfModal() {
+        document.getElementById('pdf-modal-overlay').style.display = 'none';
+    }
+
+    // Ferme la modale si on clique en dehors de la boîte, ou après avoir lancé le téléchargement
+    document.getElementById('pdf-modal-overlay').addEventListener('click', function (e) {
+        if (e.target === this) closePdfModal();
+    });
+    document.getElementById('pdf-modal-confirm').addEventListener('click', function () {
+        setTimeout(closePdfModal, 300);
+    });
+
+    // --- Masque de saisie jj/mm/aaaa pour "Date de soutenance" ---
+    // On n'utilise volontairement pas <input type="date"> : son format d'affichage
+    // dépend de la langue/du système du navigateur (parfois mm/dd/yyyy, parfois yyyy-mm-dd...).
+    // Ici on force visuellement jj/mm/aaaa, et on convertit vers le format ISO (aaaa-mm-jj)
+    // attendu par Laravel dans un champ caché juste avant l'envoi du formulaire.
+    (function () {
+        const display = document.getElementById('date_soutenance_display');
+        const hidden = document.getElementById('date_soutenance_hidden');
+        if (!display || !hidden) return;
+
+        display.addEventListener('input', function () {
+            let digits = display.value.replace(/\D/g, '').slice(0, 8);
+            let formatted = digits;
+            if (digits.length > 4) {
+                formatted = digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
+            } else if (digits.length > 2) {
+                formatted = digits.slice(0, 2) + '/' + digits.slice(2);
+            }
+            display.value = formatted;
+        });
+
+        display.closest('form').addEventListener('submit', function (e) {
+            const match = display.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+            if (display.value && !match) {
+                e.preventDefault();
+                alert('Merci de saisir une date valide au format jj/mm/aaaa.');
+                return;
+            }
+            hidden.value = match ? `${match[3]}-${match[2]}-${match[1]}` : '';
+        });
+    })();
+</script>
 
 </body>
 </html>

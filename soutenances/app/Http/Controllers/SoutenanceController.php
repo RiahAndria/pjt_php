@@ -6,6 +6,7 @@ use App\Models\Soutenance;
 use App\Models\Etudiant;
 use App\Models\Organisme;
 use App\Models\Professeur;
+use App\Services\Pdf\ProcesVerbalPdf;
 use Illuminate\Http\Request;
 
 class SoutenanceController extends Controller
@@ -14,10 +15,10 @@ class SoutenanceController extends Controller
     {
         $search = $request->input('search');
 
-        $soutenances = Soutenance::when($search, function ($query, $search) {
+        $soutenances = Soutenance::with('etudiant')->when($search, function ($query, $search) {
             return $query->where('matricule', 'like', "%{$search}%")
                          ->orWhere('annee_univ', 'like', "%{$search}%");
-        })->get();
+        })->orderBy('matricule')->get();
 
         $etudiants = Etudiant::all();
         $organismes = Organisme::all();
@@ -88,5 +89,30 @@ class SoutenanceController extends Controller
         $soutenance->delete();
 
         return redirect()->route('soutenances.index')->with('success', 'Soutenance supprimée !');
+    }
+
+    /**
+     * Génère et télécharge le procès-verbal (PDF) d'une soutenance donnée.
+     */
+    public function generatePdf(int $id)
+    {
+        $soutenance = Soutenance::with([
+            'etudiant',
+            'organisme',
+            'presidentProf',
+            'examinateurProf',
+            'rapporteurInt',
+            'rapporteurExt',
+        ])->findOrFail($id);
+
+        $pdf = new ProcesVerbalPdf();
+        $pdf->buildDocument($soutenance);
+
+        $filename = 'PV_Soutenance_' . $soutenance->matricule . '_' . $soutenance->annee_univ . '.pdf';
+
+        return response($pdf->Output('S', $filename), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 }

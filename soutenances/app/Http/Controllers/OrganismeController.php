@@ -10,7 +10,7 @@ class OrganismeController extends Controller
     // 1. Afficher la liste des organismes
     public function index()
     {
-        $organismes = Organisme::all(); // Récupère tous les organismes de Postgres
+        $organismes = Organisme::orderBy('idorg')->get(); // Récupère tous les organismes de Postgres, triés par idorg croissant
         return view('organismes.index', compact('organismes'));
     }
 
