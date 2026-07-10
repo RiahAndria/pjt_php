@@ -7,37 +7,45 @@ use Illuminate\Database\Eloquent\Model;
 class Soutenance extends Model
 {
     protected $fillable = [
-        'matricule', 
-        'idorg', 
-        'date_soutenance', // <--- Ajouté ici
-        'annee_univ', 
-        'note', 
-        'president', 
-        'examinateur', 
-        'rapporteur_int', 
-        'rapporteur_ext'
+        'matricule', 'idorg', 'annee_univ', 'note', 
+        'president', 'examinateur', 'rapporteur_int', 'rapporteur_ext',
+        'date_soutenance'
     ];
 
-    // Relation pour récupérer l'étudiant
+    protected $casts = [
+        'date_soutenance' => 'date',
+    ];
+
+    // --- Relations utilisées pour la génération du procès-verbal ---
+
     public function etudiant()
     {
         return $this->belongsTo(Etudiant::class, 'matricule', 'matricule');
     }
 
-    // Relation pour récupérer l'organisme[cite: 4]
+    // Relation pour récupérer l'organisme
     public function organisme()
     {
         return $this->belongsTo(Organisme::class, 'idorg', 'idorg');
     }
 
-    // Relations pour le jury (liés à la table professeurs)[cite: 4]
-    public function profPresident()
+    public function presidentProf()
     {
         return $this->belongsTo(Professeur::class, 'president', 'idprof');
     }
 
-    public function profExaminateur()
+    public function examinateurProf()
     {
         return $this->belongsTo(Professeur::class, 'examinateur', 'idprof');
+    }
+
+    public function rapporteurInt()
+    {
+        return $this->belongsTo(Professeur::class, 'rapporteur_int', 'idprof');
+    }
+
+    public function rapporteurExt()
+    {
+        return $this->belongsTo(Professeur::class, 'rapporteur_ext', 'idprof');
     }
 }

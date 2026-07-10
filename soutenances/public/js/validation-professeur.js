@@ -1,46 +1,39 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    // Regex email conforme à la norme HTML5 / WHATWG (bien plus stricte que ^[^\s@]+@[^\s@]+\.[^\s@]+$)
-    const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
-
-    // Note : la propriété "required" ci-dessous n'est plus utilisée pour afficher
+    // Note : la propriété "required" ci-dessous n'est pas utilisée pour afficher
     // un message en direct (voir getErrorMessage) : l'attribut HTML5 "required"
     // des champs suffit à empêcher l'envoi d'un champ vide. Elle est conservée
     // ici à titre indicatif/documentaire.
     const validationRules = {
-        matricule: {
-            required: 'Le matricule est obligatoire.',
+        idprof: {
             pattern: /^[^\s]+$/, // pas d'espaces
             maxLength: 50,
-            invalidMessage: 'Le matricule ne doit pas contenir d\'espaces et ne doit pas dépasser 50 caractères.'
+            invalidMessage: 'L\'identifiant Professeur ne doit pas contenir d\'espaces et ne doit pas dépasser 50 caractères.'
         },
         nom: {
-            required: 'Le nom est obligatoire.',
             pattern: /^[A-ZÀ-Ý\s\-']+$/, // en majuscules uniquement après transformation
             maxLength: 100,
             invalidMessage: 'Le nom ne doit contenir que des lettres, espaces, tirets et apostrophes (converti automatiquement en majuscules).'
         },
         prenoms: {
-            required: 'Les prénoms sont obligatoires.',
             pattern: /^[a-zA-ZÀ-ÿ\s\-']+$/,
-            maxLength: 100,
+            maxLength: 150,
             invalidMessage: 'Les prénoms ne doivent contenir que des lettres, espaces, tirets et apostrophes (1ère lettre de chaque mot en majuscule).'
         },
-        niveau: {
-            required: 'Le niveau est obligatoire.',
-            options: ['L1', 'L2', 'L3', 'M1', 'M2'],
-            invalidMessage: 'Le niveau doit être L1, L2, L3, M1 ou M2.'
+        civilite: {
+            options: ['Mr', 'Mme', 'Mlle'],
+            invalidMessage: 'Veuillez choisir une civilité valide.'
         },
-        parcours: {
-            required: 'Le parcours est obligatoire.',
-            options: ['GB', 'SR', 'IG'],
-            invalidMessage: 'Le parcours doit être GB, SR ou IG.'
-        },
-        adr_email: {
-            required: 'L\'adresse email est obligatoire.',
-            type: 'email',
-            maxLength: 150,
-            invalidMessage: 'L\'adresse email doit être valide (ex: nom@domaine.com) et ne doit pas dépasser 150 caractères.'
+        grade: {
+            options: [
+                'Professeur titulaire',
+                'Maître de Conférences',
+                "Assistant d'Enseignement Supérieur et de Recherche",
+                'Docteur HDR',
+                'Docteur en Informatique',
+                'Doctorant en informatique'
+            ],
+            invalidMessage: 'Veuillez choisir un grade valide.'
         }
     };
 
@@ -69,8 +62,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (newValue !== oldValue) {
             input.value = newValue;
-            // La transformation ne change jamais la longueur de la chaîne (majuscule <-> minuscule),
-            // on peut donc remettre le curseur à la même position.
             input.setSelectionRange(cursorStart, cursorEnd);
         }
     }
@@ -103,21 +94,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const value = input.value.trim();
 
-        // Tant que le champ est vide (jamais saisi, ou saisie effacée/annulée),
-        // on n'affiche aucun message : c'est l'attribut HTML5 "required" qui
-        // empêchera la soumission du formulaire dans ce cas, sans message intrusif.
+        // Champ vide (jamais saisi, ou saisie effacée/annulée) : aucun message.
+        // L'attribut HTML5 "required" empêche déjà l'envoi d'un champ vide.
         if (value.length === 0) {
             return '';
         }
 
         if (rule.maxLength && value.length > rule.maxLength) {
             return rule.invalidMessage;
-        }
-
-        if (rule.type === 'email') {
-            if (!EMAIL_REGEX.test(value)) {
-                return rule.invalidMessage;
-            }
         }
 
         if (rule.pattern && !rule.pattern.test(value)) {
@@ -131,6 +115,19 @@ document.addEventListener('DOMContentLoaded', function () {
         return '';
     }
 
+    function positionErrorMessage(input, messageElement) {
+        const form = input.closest('form');
+        if (!form || !messageElement) {
+            return;
+        }
+        // Le message est positionné en absolu par rapport au formulaire
+        // (voir CSS : la classe .prof-validation doit être en position: relative).
+        const formRect = form.getBoundingClientRect();
+        const inputRect = input.getBoundingClientRect();
+        messageElement.style.left = `${inputRect.left - formRect.left}px`;
+        messageElement.style.top = `${inputRect.bottom - formRect.top + 6}px`;
+    }
+
     function showFieldError(input) {
         const form = input.closest('form');
         const messageElement = form ? form.querySelector(`.field-error-message[data-error-for="${input.name}"]`) : null;
@@ -138,9 +135,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (messageElement) {
             messageElement.textContent = error;
-            // Ne pas surcharger la couleur/taille ici : le CSS de .field-error-message
-            // définit déjà "color: white" sur fond rouge. Les réécrire ici en rouge
-            // rendait le texte invisible (texte rouge sur fond rouge).
+            if (error) {
+                positionErrorMessage(input, messageElement);
+            }
             messageElement.style.display = error ? 'block' : 'none';
         }
 
@@ -151,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    const forms = document.querySelectorAll('form.student-validation');
+    const forms = document.querySelectorAll('form.prof-validation');
     if (!forms.length) {
         return;
     }
@@ -162,8 +159,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const inputs = form.querySelectorAll('input[name], select[name]');
 
         inputs.forEach((input) => {
-            // L'ordre importe : on transforme la casse AVANT de valider,
-            // pour que le message d'erreur reflète bien la valeur déjà transformée.
             input.addEventListener('input', () => showFieldError(input));
             input.addEventListener('blur', () => showFieldError(input));
         });
@@ -181,6 +176,16 @@ document.addEventListener('DOMContentLoaded', function () {
             if (hasError) {
                 event.preventDefault();
             }
+        });
+
+        // Recalcule la position des bulles d'erreur visibles si la fenêtre est redimensionnée
+        window.addEventListener('resize', () => {
+            inputs.forEach((input) => {
+                const messageElement = form.querySelector(`.field-error-message[data-error-for="${input.name}"]`);
+                if (messageElement && messageElement.style.display === 'block') {
+                    positionErrorMessage(input, messageElement);
+                }
+            });
         });
     });
 });

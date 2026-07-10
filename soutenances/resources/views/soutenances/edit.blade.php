@@ -17,6 +17,16 @@
 
 <div class="container">
     <h1>Modifier la Soutenance ID : {{ $soutenance->id }}</h1>
+    @if ($errors->any())
+        <div style="background:#ffe6e6;border:1px solid #ffcccc;padding:10px;margin-bottom:15px;border-radius:4px;">
+            <strong>Des erreurs sont survenues :</strong>
+            <ul style="margin:8px 0 0 18px;padding:0;">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <form action="{{ route('soutenances.update', $soutenance->id) }}" method="POST">
         @csrf
@@ -50,6 +60,24 @@
         </div>
 
         <div class="form-group">
+            <label>Date de soutenance</label>
+            <input
+                type="text"
+                id="date_soutenance_display"
+                placeholder="jj/mm/aaaa"
+                maxlength="10"
+                inputmode="numeric"
+                autocomplete="off"
+            >
+            <input
+                type="hidden"
+                name="date_soutenance"
+                id="date_soutenance_hidden"
+                value="{{ old('date_soutenance', $soutenance->date_soutenance ? \Carbon\Carbon::parse($soutenance->date_soutenance)->format('Y-m-d') : '') }}"
+            >
+        </div>
+
+        <div class="form-group">
             <label>Note</label>
             <input type="number" name="note" value="{{ $soutenance->note }}" min="0" max="20" required>
         </div>
@@ -76,12 +104,73 @@
             </select>
         </div>
 
+        <div class="form-group">
+            <label>Rapporteur Int.</label>
+            <select name="rapporteur_int" required>
+                @foreach($professeurs as $prof)
+                    <option value="{{ $prof->idprof }}" {{ $soutenance->rapporteur_int == $prof->idprof ? 'selected' : '' }}>
+                        {{ $prof->civilite }} {{ $prof->nom }} {{ isset($prof->prenoms) ? $prof->prenoms : '' }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Rapporteur Ext.</label>
+            <select name="rapporteur_ext" required>
+                @foreach($professeurs as $prof)
+                    <option value="{{ $prof->idprof }}" {{ $soutenance->rapporteur_ext == $prof->idprof ? 'selected' : '' }}>
+                        {{ $prof->civilite }} {{ $prof->nom }} {{ isset($prof->prenoms) ? $prof->prenoms : '' }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
         <div style="margin-top: 20px;">
             <a href="{{ route('soutenances.index') }}" class="btn-back">Retour</a>
             <button type="submit">Enregistrer les modifications</button>
         </div>
     </form>
 </div>
+
+<script>
+    // --- Masque de saisie jj/mm/aaaa pour "Date de soutenance" ---
+    // Même logique que la page Soutenances : on affiche toujours jj/mm/aaaa
+    // (indépendamment de la langue/du système du navigateur), et on convertit
+    // vers le format ISO (aaaa-mm-jj) attendu par Laravel dans un champ caché.
+    (function () {
+        const display = document.getElementById('date_soutenance_display');
+        const hidden = document.getElementById('date_soutenance_hidden');
+        if (!display || !hidden) return;
+
+        // Pré-remplissage : convertit la date existante (aaaa-mm-jj) en jj/mm/aaaa pour l'affichage
+        if (hidden.value) {
+            const [y, m, d] = hidden.value.split('-');
+            if (y && m && d) display.value = `${d}/${m}/${y}`;
+        }
+
+        display.addEventListener('input', function () {
+            let digits = display.value.replace(/\D/g, '').slice(0, 8);
+            let formatted = digits;
+            if (digits.length > 4) {
+                formatted = digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
+            } else if (digits.length > 2) {
+                formatted = digits.slice(0, 2) + '/' + digits.slice(2);
+            }
+            display.value = formatted;
+        });
+
+        display.closest('form').addEventListener('submit', function (e) {
+            const match = display.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+            if (display.value && !match) {
+                e.preventDefault();
+                alert('Merci de saisir une date valide au format jj/mm/aaaa.');
+                return;
+            }
+            hidden.value = match ? `${match[3]}-${match[2]}-${match[1]}` : '';
+        });
+    })();
+</script>
 
 </body>
 </html>

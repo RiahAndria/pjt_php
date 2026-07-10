@@ -6,59 +6,30 @@ use App\Models\Soutenance;
 use App\Models\Etudiant;
 use App\Models\Organisme;
 use App\Models\Professeur;
+use App\Services\Pdf\ProcesVerbalPdf;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
 
 class SoutenanceController extends Controller
 {
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $dateDebut = $request->input('date_debut');
-        $dateFin = $request->input('date_fin');
 
-        // Ajout de 'with' pour charger l'organisme et les profs
-        $soutenances = Soutenance::with(['organisme', 'profPresident', 'profExaminateur'])
-            ->when($search, function ($query, $search) {
-                return $query->where('matricule', 'like', "%{$search}%")
-                             ->orWhere('annee_univ', 'like', "%{$search}%");
-            });
-
-        // Filtrage par la date exacte de la soutenance
-        if ($dateDebut && $dateFin) {
-            try {
-                $soutenances->whereBetween('date_soutenance', [$dateDebut, $dateFin]);
-            } catch (\Exception $e) {
-                // Ignore
-            }
-        }
-
-        $soutenances = $soutenances->get();
-
-        $notesEntreDates = collect();
-        if ($dateDebut && $dateFin) {
-            try {
-                $notesEntreDates = Soutenance::whereBetween('date_soutenance', [$dateDebut, $dateFin])->get();
-            } catch (\Exception $e) {
-                $notesEntreDates = collect();
-            }
-        }
+        $soutenances = Soutenance::with('etudiant')->when($search, function ($query, $search) {
+            return $query->where('matricule', 'like', "%{$search}%")
+                         ->orWhere('annee_univ', 'like', "%{$search}%");
+        })->orderBy('matricule')->get();
 
         $etudiants = Etudiant::all();
         $organismes = Organisme::all();
         $professeurs = Professeur::all();
-        $etudiantsSansSoutenance = Etudiant::whereNotIn('matricule', Soutenance::select('matricule'))->get();
 
         return view('soutenances.index', compact(
             'soutenances',
             'search',
             'etudiants',
             'organismes',
-            'professeurs',
-            'dateDebut',
-            'dateFin',
-            'notesEntreDates',
-            'etudiantsSansSoutenance'
+            'professeurs'
         ));
     }
 
@@ -70,6 +41,7 @@ class SoutenanceController extends Controller
             'date_soutenance' => 'required|date', // <--- Validation ajoutée
             'annee_univ' => 'required|string',
             'note' => 'required|integer|min:0|max:20',
+            'date_soutenance' => 'nullable|date',
             'president' => 'required|exists:professeurs,idprof',
             'examinateur' => 'required|exists:professeurs,idprof',
             'rapporteur_int' => 'required|exists:professeurs,idprof',
@@ -81,7 +53,7 @@ class SoutenanceController extends Controller
         return redirect()->route('soutenances.index')->with('success', 'Soutenance ajoutée avec succès !');
     }
 
-    public function edit($id)
+    public function edit(int $id)
     {
         $soutenance = Soutenance::findOrFail($id);
         $etudiants = Etudiant::all();
@@ -91,7 +63,7 @@ class SoutenanceController extends Controller
         return view('soutenances.edit', compact('soutenance', 'etudiants', 'organismes', 'professeurs'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
         $soutenance = Soutenance::findOrFail($id);
 
@@ -101,6 +73,7 @@ class SoutenanceController extends Controller
             'date_soutenance' => 'required|date', // <--- Validation ajoutée
             'annee_univ' => 'required|string',
             'note' => 'required|integer|min:0|max:20',
+            'date_soutenance' => 'nullable|date',
             'president' => 'required|exists:professeurs,idprof',
             'examinateur' => 'required|exists:professeurs,idprof',
             'rapporteur_int' => 'required|exists:professeurs,idprof',
@@ -112,11 +85,36 @@ class SoutenanceController extends Controller
         return redirect()->route('soutenances.index')->with('success', 'Soutenance mise à jour avec succès !');
     }
 
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $soutenance = Soutenance::findOrFail($id);
         $soutenance->delete();
 
         return redirect()->route('soutenances.index')->with('success', 'Soutenance supprimée !');
+    }
+
+    /**
+     * Génère et télécharge le procès-verbal (PDF) d'une soutenance donnée.
+     */
+    public function generatePdf(int $id)
+    {
+        $soutenance = Soutenance::with([
+            'etudiant',
+            'organisme',
+            'presidentProf',
+            'examinateurProf',
+            'rapporteurInt',
+            'rapporteurExt',
+        ])->findOrFail($id);
+
+        $pdf = new ProcesVerbalPdf();
+        $pdf->buildDocument($soutenance);
+
+        $filename = 'PV_Soutenance_' . $soutenance->matricule . '_' . $soutenance->annee_univ . '.pdf';
+
+        return response($pdf->Output('S', $filename), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 }

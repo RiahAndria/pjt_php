@@ -31,12 +31,6 @@
                     <span class="sidebar__link-label">Soutenances</span>
                 </a>
             </li>
-            <li>
-                <a href="{{ url('/generation-pdf') }}" class="sidebar__link {{ request()->is('generation-pdf*') ? 'sidebar__link--active' : '' }}">
-                    <i class="fas fa-file-pdf sidebar__link-icon"></i>
-                    <span class="sidebar__link-label">Génération PDF</span>
-                </a>
-            </li>
             </ul>
     </nav>
 </aside>

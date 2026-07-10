@@ -16,6 +16,23 @@ class StoreEtudiantRequest extends FormRequest
     }
 
     /**
+     * Normalise la casse de "nom" (MAJUSCULES) et "prenoms" (Première Lettre En Majuscule)
+     * avant que les règles de validation ne s'appliquent, pour rester cohérent avec
+     * ce qui est affiché/transformé côté interface (validation-etudiant.js).
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'nom' => $this->filled('nom')
+                ? mb_strtoupper(trim($this->input('nom')), 'UTF-8')
+                : $this->input('nom'),
+            'prenoms' => $this->filled('prenoms')
+                ? mb_convert_case(trim($this->input('prenoms')), MB_CASE_TITLE, 'UTF-8')
+                : $this->input('prenoms'),
+        ]);
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>

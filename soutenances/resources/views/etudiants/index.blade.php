@@ -24,7 +24,7 @@
         .form-group { position: relative; margin-bottom: 1.5rem; }
         .field-error-message {
             display: none;
-            position: absolute;
+            position: relative;
             left: 0;
             top: calc(100% + 0.35rem);
             z-index: 20;

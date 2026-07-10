@@ -11,7 +11,7 @@ class ProfesseurController extends Controller
     private static array $grades = [
         'Professeur titulaire',
         'Maître de Conférences',
-        'Assistant d Enseignement Supérieur et de Recherche',
+        "Assistant d'Enseignement Supérieur et de Recherche",
         'Docteur HDR',
         'Docteur en Informatique',
         'Doctorant en informatique',
@@ -25,9 +25,10 @@ class ProfesseurController extends Controller
             $professeurs = Professeur::where('idprof', 'LIKE', "%{$search}%")
                 ->orWhere('nom', 'LIKE', "%{$search}%")
                 ->orWhere('prenoms', 'LIKE', "%{$search}%")
+                ->orderBy('idprof')
                 ->get();
         } else {
-            $professeurs = Professeur::all();
+            $professeurs = Professeur::orderBy('idprof')->get();
         }
 
         if ($request->ajax()) {
