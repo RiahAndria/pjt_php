@@ -75,7 +75,7 @@
         <main class="main-content">
             <div class="container">
                 <header class="page-header">
-                    <h1>Gestion des soutenances</h1>
+                    <h1>Gestion des soutenances    Projet PHP n°2 en Binome : 3499 et 3502 GB Groupe1</h1>
                     <p class="subtitle">Application de gestion de soutenance</p>
                 </header>
 
