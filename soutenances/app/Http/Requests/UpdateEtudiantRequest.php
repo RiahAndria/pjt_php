@@ -48,10 +48,8 @@ class UpdateEtudiantRequest extends FormRequest
                 'required',
                 'email',
                 'max:150',
-                // La clé primaire de "etudiants" est "matricule" (pas "id"),
-                // il faut donc le préciser explicitement pour que la requête SQL
-                // générée par Laravel utilise la bonne colonne à exclure.
-                Rule::unique('etudiants', 'adr_email')->ignore($this->route('etudiant'), 'matricule'),
+                // ON CHANGE ICI : On utilise 'matricule' qui correspond au paramètre de ta route web.php
+                Rule::unique('etudiants', 'adr_email')->ignore($this->route('matricule'), 'matricule'),
             ],
         ];
     }

@@ -1,4 +1,4 @@
-
+/* --- Structure du tableau --- */
 table { 
     width: 100%; 
     border-collapse: collapse; 
@@ -12,6 +12,7 @@ th, td {
     border-bottom: 1px solid var(--color-border);
 }
 
+/* --- En-têtes --- */
 th { 
     background: var(--color-accent); 
     color: var(--color-secondary);
@@ -21,8 +22,9 @@ th {
     letter-spacing: 0.5px;
 }
 
+/* --- Lignes et éléments spécifiques --- */
 tr:hover td {
-    background-color: #fafbfc;
+    background-color: var(--color-accent); /* Utilise le fond clair au survol pour rester cohérent */
 }
 
 .note-tag {

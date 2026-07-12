@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Etudiant extends Model
 {
+    public function soutenance()
+    {
+        return $this->hasOne(Soutenance::class, 'matricule', 'matricule');
+    }
     // On indique la clé primaire personnalisée
     protected $primaryKey = 'matricule';
     

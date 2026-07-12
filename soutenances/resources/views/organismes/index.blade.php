@@ -61,7 +61,7 @@
 <main class="main-content">
 
 <div class="container">
-    <h1>Gestion des Organismes</h1>
+    <h1>Organismes</h1>
 
     @if(session('success'))
         <div class="alert">{{ session('success') }}</div>

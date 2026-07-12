@@ -59,7 +59,7 @@
 <main class="main-content">
 
 <div class="container">
-    <h1>Gestion des Professeurs</h1>
+    <h1>Professeurs</h1>
 
     @if(session('success'))
         <div class="alert">{{ session('success') }}</div>

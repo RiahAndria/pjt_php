@@ -86,7 +86,7 @@
                 
                 <!-- En-tête de la page -->
                 <header class="page-header">
-                    <h1>Gestion des soutenances</h1>
+                    <h1>Tableau de bord</h1>
                     <p class="subtitle">Application de gestion de soutenance</p>
                 </header>
 

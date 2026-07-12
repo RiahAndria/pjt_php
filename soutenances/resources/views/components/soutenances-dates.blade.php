@@ -4,7 +4,10 @@
     <div class="card-table-header">
         <h4>
             <i class="fa-solid fa-calendar-days" style="color: var(--color-primary); margin-right: 8px;"></i> 
-            Notes des étudiants entre {{ $dateDebut }} et {{ $dateFin }}
+            Notes des étudiants entre 
+            {{ $dateDebut ? \Carbon\Carbon::parse($dateDebut)->format('d/m/Y') : '...' }} 
+            et 
+            {{ $dateFin ? \Carbon\Carbon::parse($dateFin)->format('d/m/Y') : '...' }}
         </h4>
     </div>
 

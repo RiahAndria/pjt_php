@@ -25,7 +25,10 @@ class HomeController extends Controller
 
         // 3. Liste des étudiants qui n'ont pas encore effectué de soutenance
         //    (déplacé depuis la page Soutenances)
-        $etudiantsSansSoutenance = Etudiant::whereNotIn('matricule', Soutenance::select('matricule'))->orderBy('nom')->orderBy('matricule')->get();
+        $etudiantsSansSoutenance = Etudiant::whereIn('niveau', ['L3', 'M2']) // Uniquement L3 et M2
+            ->whereDoesntHave('soutenance') // Qui n'ont pas de soutenance enregistrée
+            ->orderBy('matricule')
+            ->get();
 
         // 4. Liste des notes des étudiants entre deux dates, filtre optionnel via GET
         //    (déplacé depuis la page Soutenances)

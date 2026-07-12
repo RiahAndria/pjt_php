@@ -1,31 +1,25 @@
+/* --- Grille des cartes --- */
 .stats-cards-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-    margin-top: 1rem;
+    gap: var(--space-md, 1rem);
+    margin: var(--space-md, 1rem) 0 var(--space-lg, 2rem) 0;
 }
 
+/* --- Carte de statistique standard --- */
 .stat-card {
-    background: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-radius: 8px;
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md, 8px);
     padding: 1.25rem;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    gap: var(--space-md, 1rem);
 }
 
 .stat-card__badge {
-    background: #e2e8f0;
-    color: #334155;
+    background: var(--color-accent);
+    color: var(--color-text);
     font-weight: 700;
     width: 45px;
     height: 45px;
@@ -45,26 +39,27 @@
 .stat-card__count {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--color-secondary);
     line-height: 1.2;
 }
 
 .stat-card__label {
     font-size: 0.85rem;
-    color: #64748b;
+    color: var(--color-text);
+    opacity: 0.8;
 }
 
-/* Style spécial pour la carte du Total global */
+/* --- Variante : Carte du Total global --- */
 .stat-card--total {
-    background: #f0fdf4; /* Un fond légèrement vert */
-    border-color: #bbf7d0;
+    background: var(--color-accent); /* Utilise ton accent clair par défaut */
+    border-color: var(--color-primary);
 }
 
 .stat-card--total .stat-card__badge {
-    background: #22c55e; /* Badge vert */
-    color: #ffffff;
+    background: var(--color-primary);
+    color: var(--color-white);
 }
 
 .stat-card--total .stat-card__count {
-    color: #15803d;
+    color: var(--color-primary-dark);
 }

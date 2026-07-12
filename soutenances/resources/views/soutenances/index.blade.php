@@ -19,11 +19,9 @@
         
         .main-content { flex: 1; margin-left: 260px; padding: var(--space-lg); }
 
-        /* --- Bouton d'action "Générer PDF" --- */
         .action-pdf { color: #16a34a; background: none; border: none; cursor: pointer; font-size: 1rem; padding: 4px; }
         .action-pdf:hover { color: #15803d; }
 
-        /* --- Modale de confirmation de génération PDF --- */
         .pdf-modal-overlay {
             display: none;
             position: fixed; inset: 0;
@@ -62,26 +60,12 @@
 <x-sidebar />
 
 <main class="main-content">
-
 <div class="container">
-    <h1>Gestion des Soutenances</h1>
+    <h1>Soutenances</h1>
     
     @if(session('success'))
         <div class="alert">{{ session('success') }}</div>
     @endif
-
-    <!-- Formulaire de filtrage par date exacte (décommenté et opérationnel) -->
-    <div class="search-box">
-        <h3>Filtrer par date de soutenance</h3>
-        <form action="{{ route('soutenances.index') }}" method="GET" class="flex-form">
-            <input type="date" name="date_debut" value="{{ $dateDebut ?? '' }}">
-            <input type="date" name="date_fin" value="{{ $dateFin ?? '' }}">
-            <button type="submit" class="btn-search">Filtrer</button>
-            @if($dateDebut || $dateFin)
-                <a href="{{ route('soutenances.index') }}" class="reset-link">Réinitialiser</a>
-            @endif
-        </form>
-    </div>
 
     <div class="search-box">
         <h3>Rechercher par matricule ou année</h3>
@@ -99,50 +83,47 @@
         @csrf
         
         <select name="matricule" required>
-            <option value="">-- Étudiant --</option>
+            <option value="">Étudiant</option>
             @foreach($etudiants as $etudiant)
                 <option value="{{ $etudiant->matricule }}">{{ $etudiant->matricule }} - {{ $etudiant->nom }}</option>
             @endforeach
         </select>
 
         <select name="idorg" required>
-            <option value="">-- Organisme --</option>
+            <option value="">Organisme</option>
             @foreach($organismes as $organisme)
                 <option value="{{ $organisme->idorg }}">{{ $organisme->design }} ({{ $organisme->lieu }})</option>
             @endforeach
         </select>
 
-        <!-- 1. AJOUT DU CHAMP DATE DE SOUTENANCE -->
         <input type="date" name="date_soutenance" title="Date de la soutenance" required>
 
         <input type="text" name="annee_univ" placeholder="Année univ (ex: 2022-2023)" required>
-        <input type="text" id="date_soutenance_display" placeholder="jj/mm/aaaa" maxlength="10" inputmode="numeric" autocomplete="off">
-        <input type="hidden" name="date_soutenance" id="date_soutenance_hidden">
         <input type="number" name="note" placeholder="Note" min="0" max="20" required>
         
         <select name="president" required>
-            <option value="">-- Président du Jury --</option>
+            <option value="">Président du Jury</option>
             @foreach($professeurs as $prof)
                 <option value="{{ $prof->idprof }}">{{ $prof->civilite }} {{ $prof->nom }} {{ $prof->prenoms }}</option>
             @endforeach
         </select>
 
         <select name="examinateur" required>
-            <option value="">-- Examinateur --</option>
+            <option value="">Examinateur</option>
             @foreach($professeurs as $prof)
                 <option value="{{ $prof->idprof }}">{{ $prof->civilite }} {{ $prof->nom }} {{ $prof->prenoms }}</option>
             @endforeach
         </select>
 
         <select name="rapporteur_int" required>
-            <option value="">-- Rapporteur Int. --</option>
+            <option value="">Rapporteur Int.</option>
             @foreach($professeurs as $prof)
                 <option value="{{ $prof->idprof }}">{{ $prof->civilite }} {{ $prof->nom }} {{ $prof->prenoms }}</option>
             @endforeach
         </select>
 
         <select name="rapporteur_ext" required>
-            <option value="">-- Rapporteur Ext. --</option>
+            <option value="">Rapporteur Ext.</option>
             @foreach($professeurs as $prof)
                 <option value="{{ $prof->idprof }}">{{ $prof->civilite }} {{ $prof->nom }} {{ $prof->prenoms }}</option>
             @endforeach
@@ -156,7 +137,7 @@
             <tr>
                 <th>Étudiant</th>
                 <th>Organisme</th>
-                <th>Date Soutenance</th> <!-- Colonne ajoutée -->
+                <th>Date Soutenance</th>
                 <th>Année Univ</th>
                 <th>Note</th>
                 <th>Président</th>
@@ -168,32 +149,24 @@
             @forelse($soutenances as $soutenance)
                 <tr>
                     <td>{{ $soutenance->matricule }}</td>
-                    
-                    <!-- 2. NOM DE L'ORGANISME AU LIEU DE SON ID -->
                     <td>{{ $soutenance->organisme ? $soutenance->organisme->design : 'N/A' }}</td>
-                    
-                    <!-- Affichage de la date -->
                     <td>{{ \Carbon\Carbon::parse($soutenance->date_soutenance)->format('d/m/Y') }}</td>
-                    
                     <td>{{ $soutenance->annee_univ }}</td>
                     <td><span class="note-tag">{{ $soutenance->note }}/20</span></td>
-                    
-                    <!-- 3. GRADE + NOM + PRENOM POUR LE PRESIDENT ET L'EXAMINATEUR -->
                     <td>
-                        @if($soutenance->profPresident)
-                            {{ $soutenance->profPresident->civilite }}. {{ $soutenance->profPresident->nom }} {{ $soutenance->profPresident->prenoms }}
+                        @if($soutenance->presidentProf)
+                            {{ $soutenance->presidentProf->civilite }}. {{ $soutenance->presidentProf->nom }} {{ $soutenance->presidentProf->prenoms }}
                         @else
                             {{ $soutenance->president }}
                         @endif
                     </td>
                     <td>
-                        @if($soutenance->profExaminateur)
-                            {{ $soutenance->profExaminateur->civilite }}. {{ $soutenance->profExaminateur->nom }} {{ $soutenance->profExaminateur->prenoms }}
+                        @if($soutenance->examinateurProf)
+                            {{ $soutenance->examinateurProf->civilite }}. {{ $soutenance->examinateurProf->nom }} {{ $soutenance->examinateurProf->prenoms }}
                         @else
                             {{ $soutenance->examinateur }}
                         @endif
                     </td>
-                    
                     <td>
                         <div class="actions-cell">
                             <a href="{{ route('soutenances.edit', $soutenance->id) }}" class="action-edit"><i class="fa-regular fa-pen-to-square"></i></a>
@@ -226,11 +199,9 @@
         </tbody>
     </table>
 </div>
-    
 </main>
 </div>
 
-<!-- Modale de confirmation avant génération du PDF -->
 <div id="pdf-modal-overlay" class="pdf-modal-overlay">
     <div class="pdf-modal">
         <h3><i class="fa-solid fa-file-pdf"></i> Générer le procès-verbal</h3>
@@ -257,45 +228,12 @@
         document.getElementById('pdf-modal-overlay').style.display = 'none';
     }
 
-    // Ferme la modale si on clique en dehors de la boîte, ou après avoir lancé le téléchargement
     document.getElementById('pdf-modal-overlay').addEventListener('click', function (e) {
         if (e.target === this) closePdfModal();
     });
     document.getElementById('pdf-modal-confirm').addEventListener('click', function () {
         setTimeout(closePdfModal, 300);
     });
-
-    // --- Masque de saisie jj/mm/aaaa pour "Date de soutenance" ---
-    // On n'utilise volontairement pas <input type="date"> : son format d'affichage
-    // dépend de la langue/du système du navigateur (parfois mm/dd/yyyy, parfois yyyy-mm-dd...).
-    // Ici on force visuellement jj/mm/aaaa, et on convertit vers le format ISO (aaaa-mm-jj)
-    // attendu par Laravel dans un champ caché juste avant l'envoi du formulaire.
-    (function () {
-        const display = document.getElementById('date_soutenance_display');
-        const hidden = document.getElementById('date_soutenance_hidden');
-        if (!display || !hidden) return;
-
-        display.addEventListener('input', function () {
-            let digits = display.value.replace(/\D/g, '').slice(0, 8);
-            let formatted = digits;
-            if (digits.length > 4) {
-                formatted = digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
-            } else if (digits.length > 2) {
-                formatted = digits.slice(0, 2) + '/' + digits.slice(2);
-            }
-            display.value = formatted;
-        });
-
-        display.closest('form').addEventListener('submit', function (e) {
-            const match = display.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-            if (display.value && !match) {
-                e.preventDefault();
-                alert('Merci de saisir une date valide au format jj/mm/aaaa.');
-                return;
-            }
-            hidden.value = match ? `${match[3]}-${match[2]}-${match[1]}` : '';
-        });
-    })();
 </script>
 
 </body>

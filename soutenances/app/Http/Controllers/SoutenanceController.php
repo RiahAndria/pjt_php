@@ -15,12 +15,18 @@ class SoutenanceController extends Controller
     {
         $search = $request->input('search');
 
-        $soutenances = Soutenance::with('etudiant')->when($search, function ($query, $search) {
-            return $query->where('matricule', 'like', "%{$search}%")
-                         ->orWhere('annee_univ', 'like', "%{$search}%");
-        })->orderBy('matricule')->get();
+        // Requête des soutenances simplifiée (uniquement avec la recherche textuelle)
+        $soutenances = Soutenance::with('etudiant')
+            ->when($search, function ($query, $search) {
+                return $query->where('matricule', 'like', "%{$search}%")
+                            ->orWhere('annee_univ', 'like', "%{$search}%");
+            })
+            ->orderBy('matricule')
+            ->get();
 
-        $etudiants = Etudiant::all();
+        // Filtre des étudiants : Uniquement L3 et M2 (Correction effectuée sur le tableau de M2)
+        $etudiants = Etudiant::whereIn('niveau', ['L3', 'M2'])->get();
+        
         $organismes = Organisme::all();
         $professeurs = Professeur::all();
 
@@ -38,10 +44,9 @@ class SoutenanceController extends Controller
         $validated = $request->validate([
             'matricule' => 'required|exists:etudiants,matricule',
             'idorg' => 'required|exists:organismes,idorg',
-            'date_soutenance' => 'required|date', // <--- Validation ajoutée
+            'date_soutenance' => 'required|date', 
             'annee_univ' => 'required|string',
             'note' => 'required|integer|min:0|max:20',
-            'date_soutenance' => 'nullable|date',
             'president' => 'required|exists:professeurs,idprof',
             'examinateur' => 'required|exists:professeurs,idprof',
             'rapporteur_int' => 'required|exists:professeurs,idprof',
@@ -56,7 +61,7 @@ class SoutenanceController extends Controller
     public function edit(int $id)
     {
         $soutenance = Soutenance::findOrFail($id);
-        $etudiants = Etudiant::all();
+        $etudiants = Etudiant::whereIn('niveau', ['L3', 'M2'])->get();
         $organismes = Organisme::all();
         $professeurs = Professeur::all();
 
@@ -70,10 +75,9 @@ class SoutenanceController extends Controller
         $validated = $request->validate([
             'matricule' => 'required|exists:etudiants,matricule',
             'idorg' => 'required|exists:organismes,idorg',
-            'date_soutenance' => 'required|date', // <--- Validation ajoutée
+            'date_soutenance' => 'required|date',
             'annee_univ' => 'required|string',
             'note' => 'required|integer|min:0|max:20',
-            'date_soutenance' => 'nullable|date',
             'president' => 'required|exists:professeurs,idprof',
             'examinateur' => 'required|exists:professeurs,idprof',
             'rapporteur_int' => 'required|exists:professeurs,idprof',
@@ -107,7 +111,7 @@ class SoutenanceController extends Controller
             'rapporteurExt',
         ])->findOrFail($id);
 
-        $pdf = new ProcesVerbalPdf();
+        $pdf = new \App\Services\Pdf\ProcesVerbalPdf();
         $pdf->buildDocument($soutenance);
 
         $filename = 'PV_Soutenance_' . $soutenance->matricule . '_' . $soutenance->annee_univ . '.pdf';
